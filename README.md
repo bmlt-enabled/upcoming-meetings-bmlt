@@ -15,21 +15,27 @@ A minimum of root_server, services and timezone attributes are required, which w
 Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot; timezone=&quot;America/New_York&quot;]
 
 **recursive** to recurse service bodies add recursive=&quot;1&quot;
+
 Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot; timezone=&quot;America/New_York&quot; recursive=&quot;1&quot;]
 
 **services** to add multiple service bodies just seperate by a comma.
+
 Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50,37,26&quot; timezone=&quot;America/New_York&quot;]
 
 **grace_period** To add a grace period to meeting lookup add grace_period=&quot;15&quot; this would add a 15 minute grace period.
+
 Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot; timezone=&quot;America/New_York&quot; grace_period=&quot;15&quot;]
 
 **num_results** To limit the number of results add num_results=&quot;5&quot; this would limit results to 5.
+
 Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot; timezone=&quot;America/New_York&quot; state=&quot;1&quot; num_results=&quot;5&quot;]
 
 **display_type** To change the display type add display_type=&quot;table&quot; there are three different types **simple**, **table**, **block**
+
 Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; timezone=&quot;America/New_York&quot; display_type=&quot;table&quot;]
 
 **timezone** This is required and should be set to what timezones your meetings are in, We can not rely on servers time zone. add timezone=&quot;America/New_York&quot; you can set this in the admin setting or short code. A complete list of timezones can be found here http://php.net/manual/en/timezones.php
+
 Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; timezone=&quot;America/New_York&quot;]
 
 # EXAMPLES
