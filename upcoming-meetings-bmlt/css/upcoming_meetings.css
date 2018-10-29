@@ -1,0 +1,113 @@
+select.list_locations_service_body_select {
+	width: 50%;
+	max-width: 50%;
+}
+
+.chosen-container-multi .chosen-choices li.search-field input[type=text] {
+	width: 100% !important;
+}
+.chosen-container-multi * {
+	font-family: 'Courier New', Courier, monospace;
+}
+.chosen-container-multi .chosen-choices li.search-field input[type=text] {
+	font-family: "Open Sans",sans-serif !important;
+}
+
+div#upcoming_meetings_div span.c_comdef_search_results_province,
+div#upcoming_meetings_div span.c_comdef_search_results_nation,
+div#upcoming_meetings_div span.c_comdef_search_results_zip
+{
+	display:none;
+}
+
+div#upcoming_meetings_div table#bmlt_simple_meetings_table span.c_comdef_search_results_province,
+div#upcoming_meetings_div table#bmlt_simple_meetings_table span.c_comdef_search_results_nation,
+div#upcoming_meetings_div table#bmlt_simple_meetings_table span.c_comdef_search_results_zip
+{
+	display:none;
+}
+
+
+div#upcoming_meetings_div span.c_comdef_search_results_zip_separator
+{
+	display:none;
+}
+
+div#upcoming_meetings_div span.c_comdef_search_results_province_separator
+{
+	display:none;
+}
+
+div#upcoming_meetings_div span.c_comdef_search_results_nation_separator
+{
+	display:none;
+}
+
+div#upcoming_meetings_div div.bmlt_simple_meeting_one_meeting_format_div
+{
+	text-align:right;
+}
+
+div#upcoming_meetings_div div.bmlt_simple_meetings_div div.bmlt_alt_0
+{
+	background-color:#efefef;
+}
+
+div#upcoming_meetings_div div
+{
+	font-family:"Open Sans";
+	font-size: medium;
+}
+
+div#upcoming_meetings_div div.bmlt_simple_meeting_one_meeting_div
+{
+	display:table;
+	width:100%;
+}
+
+div#upcoming_meetings_div div.bmlt_simple_meeting_one_meeting_div div
+{
+	float:left;
+	padding:0.5em;
+	display:table;
+}
+
+div#upcoming_meetings_div div.bmlt_simple_meeting_one_meeting_town_div
+{
+	width:10%;
+}
+
+div#upcoming_meetings_div div.bmlt_simple_meeting_one_meeting_town_div
+{
+	width:10%;
+}
+
+div#upcoming_meetings_div div.bmlt_simple_meeting_one_meeting_town_div
+{
+	width:10%;
+}
+
+div#upcoming_meetings_div div.bmlt_simple_meeting_one_meeting_name_div
+{
+	width:20%;
+}
+
+div#upcoming_meetings_div div.bmlt_simple_meeting_one_meeting_time_div
+{
+	width:5%;
+}
+
+div#upcoming_meetings_div div.bmlt_simple_meeting_one_meeting_weekday_div
+{
+	width:5%;
+}
+
+div#upcoming_meetings_div div.bmlt_simple_meeting_one_meeting_address_div
+{
+	width:30%;
+}
+
+div#upcoming_meetings_div div.bmlt_simple_meeting_one_meeting_format_div
+{
+	width:10%;
+}

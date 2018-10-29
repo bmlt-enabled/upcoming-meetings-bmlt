@@ -1,0 +1,75 @@
+=== Upcoming Meetings BMLT ===
+
+Contributors: pjaudiomv
+Plugin URI: https://wordpress.org/plugins/upcoming-meetings-bmlt/
+Tags: bmlt, basic meeting list toolbox, Upcoming Meetings, Upcoming Meetings BMLT, narcotics anonymous, na
+Requires at least: 4.0
+Requires PHP: 5.6
+Tested up to: 4.9.8
+Stable tag: 1.0.0
+License: GPLv2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+
+== Description ==
+
+Upcoming Meetings BMLT is a plugin that displays the next 'N' number of meetings from the current time on your page or in a widget using the upcoming_meetings shortcode.
+
+SHORTCODE
+Basic: [upcoming_meetings]
+Attributes: root_server, services, recursive, grace_period, num_results, display_type, timezone
+
+-- Shortcode parameters can be combined
+
+== Usage ==
+
+A minimum of root_server, services and timezone attributes are required, which would return the next 5 meetings in simple view with a 15minute grace period.
+
+Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot; timezone=&quot;America/New_York&quot;]
+
+**recursive** to recurse service bodies add recursive=&quot;1&quot;
+Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot; timezone=&quot;America/New_York&quot; recursive=&quot;1&quot;]
+
+**services** to add multiple service bodies just seperate by a comma.
+Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50,37,26&quot; timezone=&quot;America/New_York&quot;]
+
+**grace_period** To add a grace period to meeting lookup add grace_period=&quot;15&quot; this would add a 15 minute grace period.
+Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot; timezone=&quot;America/New_York&quot; grace_period=&quot;15&quot;]
+
+**num_results** To limit the number of results add num_results=&quot;5&quot; this would limit results to 5.
+Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot; timezone=&quot;America/New_York&quot; state=&quot;1&quot; num_results=&quot;5&quot;]
+
+**display_type** To change the display type add display_type=&quot;table&quot; there are three different types **simple**, **table**, **block**
+Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; timezone=&quot;America/New_York&quot; display_type=&quot;table&quot;]
+
+**timezone** This is required and should be set to what timezones your meetings are in, We can not rely on servers time zone. add timezone=&quot;America/New_York&quot; you can set this in the admin setting or short code. A complete list of timezones can be found here http://php.net/manual/en/timezones.php
+Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; timezone=&quot;America/New_York&quot;]
+
+== EXAMPLES ==
+
+<a href="https://sca.charlestonna.org/upcoming-meetings/">https://sca.charlestonna.org/upcoming-meetings/</a>
+
+<a href="https://sca.charlestonna.org/upcoming-meetings-table/">https://sca.charlestonna.org/upcoming-meetings-table/</a>
+
+<a href="https://sca.charlestonna.org/upcoming-meetings-block/">https://sca.charlestonna.org/upcoming-meetings-block/</a>
+
+
+== MORE INFORMATION ==
+
+<a href="https://github.com/pjaudiomv/upcoming-meetings-bmlt" target="_blank">https://github.com/pjaudiomv/upcoming-meetings-bmlt</a>
+
+
+== Installation ==
+
+This section describes how to install the plugin and get it working.
+
+1. Download and install the plugin from WordPress dashboard. You can also upload the entire Upcoming Meetings BMLT Plugin folder to the /wp-content/plugins/ directory
+2. Activate the plugin through the Plugins menu in WordPress
+3. Add [upcoming_meetings] shortcode to your WordPress page/post.
+4. At a minimum assign root_server, services and timezone attributes.
+
+
+== Changelog ==
+
+= 1.0.0 =
+
+* Initial WordPress submission.
