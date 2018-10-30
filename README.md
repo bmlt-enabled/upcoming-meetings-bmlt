@@ -64,6 +64,10 @@ This section describes how to install the plugin and get it working.
 
 # Changelog
 
+= 1.1.0 =
+
+* Adjustments for defaults and added custom css box in admin.
+
 = 1.0.0 =
 
 * Initial WordPress submission.

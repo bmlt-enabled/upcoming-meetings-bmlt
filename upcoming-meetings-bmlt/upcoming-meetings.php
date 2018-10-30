@@ -4,7 +4,7 @@ Plugin Name: Upcoming Meetings BMLT
 Plugin URI: https://wordpress.org/plugins/upcoming-meetings-bmlt/
 Author: pjaudiomv
 Description: This plugin returns all unique towns or counties for given service body on your site Simply add [list_locations] shortcode to your page and set shortcode attributes accordingly. Required attributes are root_server and services.
-Version: 1.0.0
+Version: 1.1.0
 Install: Drop this directory into the "wp-content/plugins/" directory and activate it.
 */
 /* Disallow direct access to the plugin file */
@@ -154,34 +154,36 @@ if (!class_exists("UpcomingMeetings")) {
             if ($services == '') {
                 return '<p><strong>Upcoming Meetings Error: Services missing. Please verify you have entered a service body id using the \'services\' shortcode attribute</strong></p>';
             }
-            $meeting_results = $this->getMeetingsJson($root_server, $services, $timezone, $grace_period, $recursive, $num_results);
-            if ($display_type != '' && $display_type == 'simple') {
-                $meeting_data = '';
-                for ($i = 0; $i < count($meeting_results); $i++) {
-                    $meeting_data .= "<div class='upcoming-meetings-time-meeting-name'>" . date('g:i A',strtotime($meeting_results[$i]['start_time'])) . "&nbsp;&nbsp;&nbsp;" .$days_of_the_week[intval ( $meeting_results[$i]['weekday_tinyint'] )]. "&nbsp;&nbsp;&nbsp;" .$meeting_results[$i]['meeting_name'] . "</div>";
-                    $meeting_data .= "<div class='upcoming-meetings-location-address'>" . $meeting_results[$i]['location_street'] . "&nbsp;&nbsp;&nbsp;" . $meeting_results[$i]['location_municipality'] . ",&nbsp;" . $meeting_results[$i]['location_province'] . "&nbsp;&nbsp;&nbsp;" . $value['location_postal_code_1'] . '</div>';
-                    $meeting_data .= "<div class='upcoming-meetings-formats-location-info-comments'>" . $meeting_results[$i]['formats'] . "&nbsp;&nbsp;&nbsp;" . $meeting_results[$i]['location_info'] . "&nbsp;" . $meeting_results[$i]['comments'] . '</div>';
-                    $meeting_data .= "<div class='upcoming-meetings-map-link'>" . "<a href='https://maps.google.com/maps?q=" . $meeting_results[$i]['latitude'] . "," . $meeting_results[$i]['longitude'] . "' target='new'>Map</a></div>";
-                    $meeting_data .= "<div class='upcoming-meetings-break'>&nbsp;</div>";
 
-                    if ($num_results == $i + 1) break;
-                }
-                return $meeting_data;
-            }
+            $output = '';
+            $css_um = $this->options['custom_css_um'];
+
+            $output .= "<style type='text/css'>$css_um</style>";
+
+            $meeting_results = $this->getMeetingsJson($root_server, $services, $timezone, $grace_period, $recursive, $num_results);
 
             if ($display_type != '' && $display_type == 'table') {
-                $meetings_table = '<div id="upcoming_meetings_div">';
-                $meetings_table .= $this->MeetingsJson2Html($meeting_results,false);
-                $meetings_table .= '</div>';
-                return $meetings_table;
+                $output .= '<div id="upcoming_meetings_div">';
+                $output .= $this->MeetingsJson2Html($meeting_results,false);
+                $output .= '</div>';
             }
 
             if ($display_type != '' && $display_type == 'block') {
-                $meetings_block = '<div id="upcoming_meetings_div">';
-                $meetings_block .= $this->MeetingsJson2Html($meeting_results,true);
-                $meetings_block .= '</div>';
-                return $meetings_block;
+                $output .= '<div id="upcoming_meetings_div">';
+                $output .= $this->MeetingsJson2Html($meeting_results,true);
+                $output .= '</div>';
             }
+
+            if ($display_type != 'table' && $display_type != 'block') {
+                foreach ($meeting_results as $meeting) {
+                    $output .= "<div class='upcoming-meetings-time-meeting-name'>" . date('g:i A',strtotime($meeting['start_time'])) . "&nbsp;&nbsp;&nbsp;" .$days_of_the_week[intval ( $meeting['weekday_tinyint'] )]. "&nbsp;&nbsp;&nbsp;" .$meeting['meeting_name'] . "</div>";
+                    $output .= "<div class='upcoming-meetings-location-address'>" . $meeting['location_street'] . "&nbsp;&nbsp;&nbsp;" . $meeting['location_municipality'] . ",&nbsp;" . $meeting['location_province'] . "&nbsp;" . $meeting['location_postal_code_1'] . '</div>';
+                    $output .= "<div class='upcoming-meetings-formats-location-info-comments'>" . $meeting['formats'] . "&nbsp;&nbsp;&nbsp;" . $meeting['location_info'] . "&nbsp;" . $meeting['comments'] . '</div>';
+                    $output .= "<div class='upcoming-meetings-map-link'>" . "<a href='https://maps.google.com/maps?q=" . $meeting['latitude'] . "," . $meeting['longitude'] . "' target='new'>Map</a></div>";
+                    $output .= "<div class='upcoming-meetings-break'>&nbsp;</div>";
+                }
+            }
+            return $output;
         }
 
         /**
@@ -237,6 +239,7 @@ if (!class_exists("UpcomingMeetings")) {
                 $this->options['num_results_dropdown']   = sanitize_text_field($_POST['num_results_dropdown']);
                 $this->options['timezones_dropdown']     = sanitize_text_field($_POST['timezones_dropdown']);
                 $this->options['display_type_dropdown']  = sanitize_text_field($_POST['display_type_dropdown']);
+                $this->options['custom_css_um']          = $_POST['custom_css_um'];
 
                 $this->save_admin_options();
                 echo '<div class="updated"><p>Success! Your changes were successfully saved!</p></div>';
@@ -373,6 +376,15 @@ if (!class_exists("UpcomingMeetings")) {
                             </li>
                         </ul>
                     </div>
+                    <div style="padding: 0 15px;" class="postbox">
+                        <h3>Custom CSS</h3>
+                        <p>Allows for custom styling of Upcoming Meetings.</p>
+                        <ul>
+                            <li>
+                                <textarea id="custom_css_um" name="custom_css_um" cols="100" rows="10"><?php echo $this->options['custom_css_um']; ?></textarea>
+                            </li>
+                        </ul>
+                    </div>
                     <input type="submit" value="SAVE CHANGES" name="upcomingmeetingssave" class="button-primary" />
                 </form>
                 <br/><br/>
@@ -406,8 +418,8 @@ if (!class_exists("UpcomingMeetings")) {
                     'recursive'              => '0',
                     'grace_period_dropdown'  => '15',
                     'num_results_dropdown'   => '5',
-                    'timezones_dropdown'     => '',
-                    'display_type_dropdown'  => 'Simple'
+                    'timezones_dropdown'     => 'America/New_York',
+                    'display_type_dropdown'  => 'simple'
                 );
                 update_option($this->optionsName, $theOptions);
             }
@@ -464,42 +476,10 @@ if (!class_exists("UpcomingMeetings")) {
 
             return $final_result;
         }
-        public function getMeetingsSimple($root_server, $services, $timezone, $grace_period, $recursive, $num_results)
-        {
-            date_default_timezone_set($timezone);
-            list($hour, $minute) = preg_split('/[:]/', date('G:i', strtotime('+' .$grace_period. 'minutes', strtotime(date('G:i')))));
-            $serviceBodies = explode(',', $services);
-            $services_query = '';
-            foreach ($serviceBodies as $serviceBody) {
-                $services_query .= '&services[]=' . $serviceBody;
-            }
-            $serviceBodiesURL =  wp_remote_retrieve_body(wp_remote_get($root_server . "/client_interface/json/?switcher=GetSearchResults&weekdays=" . (date('w')+1) .$services_query. "&StartsAfterH=" .$hour. "&StartsAfterM=" .$minute. ($recursive == "1" ? "&recursive=1" : "")));
-            $serviceBodies_results = json_decode($serviceBodiesURL,true);
-            $results_count = count($serviceBodies_results);
 
-            if ($results_count != 0 && $results_count < $num_results) {
-                $addtl_count_needed = $num_results - $results_count;
-                $serviceBodiesURL_addtl =  wp_remote_retrieve_body(wp_remote_get($root_server . "/client_interface/json/?switcher=GetSearchResults&weekdays=" . (date('w')+2) .$services_query. ($recursive == "1" ? "&recursive=1" : "" . "&page_size=" .$addtl_count_needed. "&page_num=1")));
-                $added_results = json_decode($serviceBodiesURL_addtl, true);
-                $final_result = array_merge($serviceBodies_results,$added_results);
-            }
-            else if ($results_count == 0) {
-                $serviceBodiesURL_addtl =  wp_remote_retrieve_body(wp_remote_get($root_server . "/client_interface/json/?switcher=GetSearchResults&weekdays=" . (date('w')+2) .$services_query. ($recursive == "1" ? "&recursive=1" : "" . "&page_size=" .$num_results. "&page_num=1")));
-                $final_result = json_decode($serviceBodiesURL_addtl, true);
-            }
-            // if ($results_count >= $num_results) {
-            else {
-                $final_result = array_slice($serviceBodies_results, 0, $num_results);
-            }
-
-            return $final_result;
-        }
         /*******************************************************************/
-        /**  $ret = null; $result = null;
-
-        $in_block = false
+        /**
         \brief	This returns the search results, in whatever form was requested.
-
         \returns XHTML data. It will either be a table, or block elements.
          */
         public function MeetingsJson2Html (
@@ -513,7 +493,7 @@ if (!class_exists("UpcomingMeetings")) {
 
             $ret = '';
 
-            // What we do, is to parse the CSV return. We'll pick out certain fields, and format these into a table or block element return.
+            // What we do, is to parse the JSON return. We'll pick out certain fields, and format these into a table or block element return.
             if ( $results )
             {
 

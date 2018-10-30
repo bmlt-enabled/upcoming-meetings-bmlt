@@ -6,7 +6,7 @@ Tags: bmlt, basic meeting list toolbox, Upcoming Meetings, Upcoming Meetings BML
 Requires at least: 4.0
 Requires PHP: 5.6
 Tested up to: 4.9.8
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -75,6 +75,10 @@ This section describes how to install the plugin and get it working.
 4. screenshot-4.png
 
 == Changelog ==
+
+= 1.1.0 =
+
+* Adjustments for defaults and added custom css box in admin.
 
 = 1.0.0 =
 
