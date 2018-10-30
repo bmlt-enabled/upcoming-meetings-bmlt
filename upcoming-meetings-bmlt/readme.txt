@@ -67,6 +67,12 @@ This section describes how to install the plugin and get it working.
 3. Add [upcoming_meetings] shortcode to your WordPress page/post.
 4. At a minimum assign root_server, services and timezone attributes.
 
+== Screenshots ==
+
+1. screenshot-1.png
+2. screenshot-2.png
+3. screenshot-3.png
+4. screenshot-4.png
 
 == Changelog ==
 
