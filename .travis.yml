@@ -55,7 +55,7 @@ jobs:
     - cd travis
     script:
     - chmod +x deploy-wordpress.sh
-    - deploy-wordpress.sh
+    - ./deploy-wordpress.sh
 notifications:
   slack:
     rooms:
