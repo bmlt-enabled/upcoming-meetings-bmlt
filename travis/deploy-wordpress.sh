@@ -24,20 +24,11 @@
 # 19. Copy /trunk into /tags/{version}, and SVN commit.
 # 20. Delete temporary local SVN checkout.
 
-echo
-echo "WordPress Plugin SVN Deploy v3.0.0"
-echo
-echo "Let's collect some information first. There are six questions."
-echo
-echo "Default values are in brackets - just hit enter to accept them."
-echo
-
 PLUGINSLUG="upcoming-meetings-bmlt"
 PLUGINDIR="./../upcoming-meetings-bmlt"
 MAINFILE="upcoming-meetings.php"
 SVNPATH="/tmp/upcoming-meetings-bmlt"
 SVNURL="https://plugins.svn.wordpress.org/upcoming-meetings-bmlt"
-SVNUSER="pjaudiomv"
 
 # Set up some default values. Feel free to change these in your own script
 CURRENTDIR=$(pwd)
@@ -72,14 +63,13 @@ elif [ "$PLUGINVERSION" = "$READMEVERSION" ]; then
 	echo "Versions match in readme.txt and $MAINFILE. Let's continue..."
 fi
 
-echo "That's all of the data collected."
 echo
 echo "Slug: $PLUGINSLUG"
 echo "Plugin directory: $PLUGINDIR"
 echo "Main file: $MAINFILE"
 echo "Temp checkout path: $SVNPATH"
 echo "Remote SVN repo: $SVNURL"
-echo "SVN username: $SVNUSER"
+echo "SVN username: $WORDPRESS_USERNAME"
 echo
 
 printf "OK to proceed (Y|n)? "
@@ -167,7 +157,7 @@ cd $SVNPATH/trunk/
 svn status | grep -v "^.[ \t]*\..*" | grep "^\!" | awk '{print $2"@"}' | xargs svn del
 # Add all new files that are not set to be ignored
 svn status | grep -v "^.[ \t]*\..*" | grep "^?" | awk '{print $2"@"}' | xargs svn add
-svn commit --username=$SVNUSER -m "Preparing for $PLUGINVERSION release"
+svn commit --username=$WORDPRESS_USERNAME --password=$WORDPRESS_PASSWORD -m "Preparing for $PLUGINVERSION release"
 
 echo
 
@@ -178,7 +168,7 @@ svn status | grep -v "^.[ \t]*\..*" | grep "^\!" | awk '{print $2"@"}' | xargs s
 # Add all new files that are not set to be ignored
 svn status | grep -v "^.[ \t]*\..*" | grep "^?" | awk '{print $2"@"}' | xargs svn add
 svn update --quiet --accept working $SVNPATH/assets/*
-svn commit --username=$SVNUSER -m "Updating assets"
+svn commit --username=$WORDPRESS_USERNAME --password=$WORDPRESS_PASSWORD -m "Updating assets"
 
 echo
 
@@ -190,7 +180,7 @@ svn delete --force --quiet $SVNPATH/tags/$PLUGINVERSION/assets
 svn delete --force --quiet $SVNPATH/tags/$PLUGINVERSION/trunk
 svn update --quiet --accept working $SVNPATH/tags/$PLUGINVERSION
 cd $SVNPATH/tags/$PLUGINVERSION
-svn commit --username=$SVNUSER -m "Tagging version $PLUGINVERSION"
+svn commit --username=$WORDPRESS_USERNAME --password=$WORDPRESS_PASSWORD -m "Tagging version $PLUGINVERSION"
 
 echo
 
