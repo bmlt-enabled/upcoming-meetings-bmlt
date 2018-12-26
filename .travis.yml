@@ -51,20 +51,11 @@ jobs:
       on:
         tags: true
     - stage: deploy to wordpress
-      if: branch IN (add-travis) OR tag IS present
-      before_deploy:
-      - chmod +x travis/deploy-wordpress.sh
-      deploy:
-      - provider: script
-        script: travis/deploy-wordpress.sh
-        skip_cleanup: true
-        on:
-          branch: add-travis
-      - provider: script
-        script: travis/deploy-wordpress.sh
-        skip_cleanup: true
-        on:
-          tags: true
+      install:
+      - cd travis
+      script:
+      - chmod +x deploy-wordpress.sh
+      - deploy-wordpress.sh
 notifications:
   slack:
     rooms:
