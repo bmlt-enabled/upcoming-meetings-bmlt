@@ -64,6 +64,10 @@ This section describes how to install the plugin and get it working.
 
 # Changelog
 
+= 1.1.2 =
+
+* Code cleanup.
+
 = 1.1.1 =
 
 * Grace period should be subtracting not added.
