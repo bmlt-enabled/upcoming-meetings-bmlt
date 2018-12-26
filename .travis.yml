@@ -50,12 +50,12 @@ jobs:
       name: "$TRAVIS_TAG"
       on:
         tags: true
-    - stage: deploy to wordpress
-      install:
-      - cd travis
-      script:
-      - chmod +x deploy-wordpress.sh
-      - deploy-wordpress.sh
+  - stage: deploy to wordpress
+    install:
+    - cd travis
+    script:
+    - chmod +x deploy-wordpress.sh
+    - deploy-wordpress.sh
 notifications:
   slack:
     rooms:
