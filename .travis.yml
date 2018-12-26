@@ -29,6 +29,7 @@ jobs:
     - find ./ -name '*.php' | xargs chmod 644
     - zip -r $ZIP_FILENAME upcoming-meetings-bmlt && mkdir $BUILD_DIR && mv $ZIP_FILENAME $BUILD_DIR/
     before_deploy:
+    - chmod +x travis/deploy-wordpress.sh
     - mkdir -p $DIST_DIR_S3 && cp $BUILD_DIR/$ZIP_FILENAME $DIST_DIR_S3/$ZIP_FILENAME
     - mkdir -p $DIST_DIR_GITHUB && cp $BUILD_DIR/$ZIP_FILENAME $DIST_DIR_GITHUB/$GITHUB_RELEASE_FILENAME
     deploy:
@@ -50,12 +51,10 @@ jobs:
       name: "$TRAVIS_TAG"
       on:
         tags: true
-  - stage: deploy to wordpress
-    install:
-    - cd travis
-    script:
-    - chmod +x deploy-wordpress.sh
-    - ./deploy-wordpress.sh
+    - provider: script
+      script: bash travis/deploy-wordpress.sh
+      on:
+        tags: true
 notifications:
   slack:
     rooms:

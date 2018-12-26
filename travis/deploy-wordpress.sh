@@ -1,36 +1,27 @@
 #! /bin/bash
-# See https://github.com/GaryJones/wordpress-plugin-svn-deploy for instructions and credits.
 #
 # Steps to deploying:
 #
-#  1. Ask for plugin slug.
-#  2. Ask for local plugin directory.
-#  3. Check local plugin directory exists.
-#  4. Ask for main plugin file name.
-#  5. Check main plugin file exists.
-#  6. Check readme.txt version matches main plugin file version.
-#  7. Ask for temporary SVN path.
-#  8. Ask for remote SVN repo.
-#  9. Ask for SVN username.
-# 10. Ask if input is correct, and give chance to abort.
-# 11. Check if Git tag exists for version number (must match exactly).
-# 12. Checkout SVN repo.
-# 13. Set to SVN ignore some GitHub-related files.
-# 14. Export HEAD of master from git to the trunk of SVN.
-# 15. Initialise and update and git submodules.
-# 16. Move /trunk/assets up to /assets.
-# 17. Move into /trunk, and SVN commit.
-# 18. Move into /assets, and SVN commit.
-# 19. Copy /trunk into /tags/{version}, and SVN commit.
-# 20. Delete temporary local SVN checkout.
+#  1. Check local plugin directory exists.
+#  2. Check main plugin file exists.
+#  3. Check readme.txt version matches main plugin file version.
+#  4. Get SVN username and password from Travis Environment Variables.
+#  5. Check if Git tag exists for version number (must match exactly).
+#  6. Checkout SVN repo.
+#  7. Set to SVN ignore some GitHub-related files.
+#  8. Export HEAD of master from git to the trunk of SVN.
+#  9. Move /trunk/assets up to /assets.
+# 10. Move into /trunk, and SVN commit.
+# 11. Move into /assets, and SVN commit.
+# 12. Copy /trunk into /tags/{version}, and SVN commit.
+# 13. Delete temporary local SVN checkout.
 
+# Set up some default values.
 PLUGINSLUG="upcoming-meetings-bmlt"
 PLUGINDIR="./../upcoming-meetings-bmlt"
 MAINFILE="upcoming-meetings.php"
 SVNPATH="/tmp/upcoming-meetings-bmlt"
 SVNURL="https://plugins.svn.wordpress.org/upcoming-meetings-bmlt"
-
-# Set up some default values. Feel free to change these in your own script
 CURRENTDIR=$(pwd)
 
 # Check directory exists.
@@ -69,16 +60,15 @@ echo "Plugin directory: $PLUGINDIR"
 echo "Main file: $MAINFILE"
 echo "Temp checkout path: $SVNPATH"
 echo "Remote SVN repo: $SVNURL"
-echo "SVN username: $WORDPRESS_USERNAME"
 echo
 
-printf "OK to proceed (Y|n)? "
-read -e input
-PROCEED="${input:-y}"
-echo
+# printf "OK to proceed (Y|n)? "
+# read -e input
+# PROCEED="${input:-y}"
+# echo
 
 # Allow user cancellation
-if [ $(echo "$PROCEED" |tr [:upper:] [:lower:]) != "y" ]; then echo "Aborting..."; exit 1; fi
+# if [ $(echo "$PROCEED" |tr [:upper:] [:lower:]) != "y" ]; then echo "Aborting..."; exit 1; fi
 
 # Let's begin...
 echo ".........................................."
@@ -119,25 +109,6 @@ Thumbs.db
 
 echo "Exporting the HEAD of master from git to the trunk of SVN"
 git checkout-index -a -f --prefix=$SVNPATH/trunk/
-
-# If submodule exist, recursively check out their indexes
-if [ -f ".gitmodules" ]
-	then
-		echo "Exporting the HEAD of each submodule from git to the trunk of SVN"
-		git submodule init
-		git submodule update
-		git config -f .gitmodules --get-regexp '^submodule\..*\.path$' |
-			while read path_key path
-			do
-				#url_key=$(echo $path_key | sed 's/\.path/.url/')
-				#url=$(git config -f .gitmodules --get "$url_key")
-				#git submodule add $url $path
-				echo "This is the submodule path: $path"
-				echo "The following line is the command to checkout the submodule."
-				echo "git submodule foreach --recursive 'git checkout-index -a -f --prefix=$SVNPATH/trunk/$path/'"
-				git submodule foreach --recursive 'git checkout-index -a -f --prefix=$SVNPATH/trunk/$path/'
-			done
-fi
 
 echo
 
