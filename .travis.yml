@@ -22,8 +22,6 @@ jobs:
     - DIST_DIR_S3=dist/s3
     - DIST_DIR_GITHUB=dist/github
     - GITHUB_RELEASE_FILENAME=upcoming-meetings-bmlt.zip
-    install:
-    - composer install --no-dev --no-autoloader
     script:
     - find ./ -type d | xargs chmod 755
     - find ./ -name '*.php' | xargs chmod 644

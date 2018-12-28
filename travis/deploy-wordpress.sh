@@ -1,163 +1,106 @@
-#! /bin/bash
-#
-# Steps to deploying:
-#
-#  1. Check local plugin directory exists.
-#  2. Check main plugin file exists.
-#  3. Check readme.txt version matches main plugin file version.
-#  4. Get SVN username and password from Travis Environment Variables.
-#  5. Check if Git tag exists for version number (must match exactly).
-#  6. Checkout SVN repo.
-#  7. Set to SVN ignore some GitHub-related files.
-#  8. Export HEAD of master from git to the trunk of SVN.
-#  9. Move /trunk/assets up to /assets.
-# 10. Move into /trunk, and SVN commit.
-# 11. Move into /assets, and SVN commit.
-# 12. Copy /trunk into /tags/{version}, and SVN commit.
-# 13. Delete temporary local SVN checkout.
+#!/usr/bin/env bash
 
-# Set up some default values.
-PLUGINSLUG="upcoming-meetings-bmlt"
-PLUGINDIR="./../upcoming-meetings-bmlt"
-MAINFILE="upcoming-meetings.php"
-SVNPATH="/tmp/upcoming-meetings-bmlt"
-SVNURL="https://plugins.svn.wordpress.org/upcoming-meetings-bmlt"
-CURRENTDIR=$(pwd)
-
-# Check directory exists.
-if [ ! -d "$PLUGINDIR" ]; then
-  echo "Directory $PLUGINDIR not found. Aborting."
-  exit 1;
+if [[ -z "$TRAVIS" ]]; then
+	echo "Script is only to be run by Travis CI" 1>&2
+	exit 1
 fi
 
-# Check main plugin file exists.
-if [ ! -f "$PLUGINDIR/$MAINFILE" ]; then
-  echo "Plugin file $PLUGINDIR/$MAINFILE not found. Aborting."
-  exit 1;
+if [[ -z "$WORDPRESS_PASSWORD" ]]; then
+	echo "WordPress.org password not set" 1>&2
+	exit 1
 fi
 
-echo "Checking version in main plugin file matches version in readme.txt file..."
-echo
+PLUGIN="upcoming-meetings-bmlt"
+PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 
-# Check version in readme.txt is the same as plugin file after translating both to Unix line breaks to work around grep's failure to identify Mac line breaks
-PLUGINVERSION=$(grep -i "Version:" $PLUGINDIR/$MAINFILE | awk -F' ' '{print $NF}' | tr -d '\r')
-echo "$MAINFILE version: $PLUGINVERSION"
-READMEVERSION=$(grep -i "Stable tag:" $PLUGINDIR/readme.txt | awk -F' ' '{print $NF}' | tr -d '\r')
-echo "readme.txt version: $READMEVERSION"
+echo "$PROJECT_ROOT"
 
-if [ "$READMEVERSION" = "trunk" ]; then
-	echo "Version in readme.txt & $MAINFILE don't match, but Stable tag is trunk. Let's continue..."
-elif [ "$PLUGINVERSION" != "$READMEVERSION" ]; then
-	echo "Version in readme.txt & $MAINFILE don't match. Exiting...."
-	exit 1;
-elif [ "$PLUGINVERSION" = "$READMEVERSION" ]; then
-	echo "Versions match in readme.txt and $MAINFILE. Let's continue..."
+PLUGIN_BUILDS_PATH="$PROJECT_ROOT/builds"
+VERSION="$TRAVIS_TAG"
+ZIP_FILE="$PLUGIN.zip"
+
+BUILD_DIR=builds
+find ./ -type d | xargs chmod 755
+find ./ -name '*.php' | xargs chmod 644
+zip -r $ZIP_FILE upcoming-meetings-bmlt
+mkdir $BUILD_DIR
+mv $ZIP_FILE $BUILD_DIR/
+
+cd "$PLUGIN_BUILDS_PATH"
+
+
+# Ensure the zip file for the current version has been built
+if [ ! -f "$ZIP_FILE" ]; then
+    echo "Built zip file $ZIP_FILE does not exist" 1>&2
+    exit 1
 fi
 
-echo
-echo "Slug: $PLUGINSLUG"
-echo "Plugin directory: $PLUGINDIR"
-echo "Main file: $MAINFILE"
-echo "Temp checkout path: $SVNPATH"
-echo "Remote SVN repo: $SVNURL"
-echo
-
-# printf "OK to proceed (Y|n)? "
-# read -e input
-# PROCEED="${input:-y}"
-# echo
-
-# Allow user cancellation
-# if [ $(echo "$PROCEED" |tr [:upper:] [:lower:]) != "y" ]; then echo "Aborting..."; exit 1; fi
-
-# Let's begin...
-echo ".........................................."
-echo
-echo "Preparing to deploy WordPress plugin"
-echo
-echo ".........................................."
-echo
-
-echo
-
-echo "Changing to $PLUGINDIR"
-cd $PLUGINDIR
-
-# Check for git tag (may need to allow for leading "v"?)
-# if git show-ref --tags --quiet --verify -- "refs/tags/$PLUGINVERSION"
-if git show-ref --tags --quiet --verify -- "refs/tags/$PLUGINVERSION"
-	then
-		echo "Git tag $PLUGINVERSION does exist. Let's continue..."
-	else
-		echo "$PLUGINVERSION does not exist as a git tag. Aborting.";
-		exit 1;
+# Check if the tag exists for the version we are building
+TAG=$(svn ls "https://plugins.svn.wordpress.org/$PLUGIN/tags/$VERSION")
+error=$?
+if [ $error == 0 ]; then
+    # Tag exists, don't deploy
+    echo "Tag already exists for version $VERSION, aborting deployment"
+    exit 1
 fi
+  
 
-echo
 
-echo "Creating local copy of SVN repo trunk..."
-svn checkout $SVNURL $SVNPATH --depth immediates
-svn update --quiet $SVNPATH/trunk --set-depth infinity
+# Remove any unzipped dir so we start from scratch
+rm -fR "$PLUGIN"
+# Unzip the built plugin
+unzip -q -o "$ZIP_FILE"
 
-echo "Ignoring GitHub specific files"
-svn propset svn:ignore "README.md
-Thumbs.db
-.github/*
-.git
-.gitattributes
-.gitignore" "$SVNPATH/trunk/"
+# Clean up any previous svn dir
+rm -fR svn
 
-echo "Exporting the HEAD of master from git to the trunk of SVN"
-git checkout-index -a -f --prefix=$SVNPATH/trunk/
+# Checkout the SVN repo
+svn co -q "http://svn.wp-plugins.org/$PLUGIN" svn
 
-echo
+# Move out the trunk directory to a temp location
+mv svn/trunk ./svn-trunk
+# Create trunk directory
+mkdir svn/trunk
+# Copy our new version of the plugin into trunk
+rsync -r -p $PLUGIN/* svn/trunk
 
-# Support for the /assets folder on the .org repo.
-echo "Moving assets."
-# Make the directory if it doesn't already exist
-mkdir -p $SVNPATH/assets/
-mv $SVNPATH/trunk/assets/* $SVNPATH/assets/
-svn add --force $SVNPATH/assets/
-svn delete --force $SVNPATH/trunk/assets
+# Copy all the .svn folders from the checked out copy of trunk to the new trunk.
+# This is necessary as the Travis container runs Subversion 1.6 which has .svn dirs in every sub dir
+cd svn/trunk/
+TARGET=$(pwd)
+cd ../../svn-trunk/
 
-echo
+# Find all .svn dirs in sub dirs
+SVN_DIRS=`find . -type d -iname .svn`
 
-echo "Changing directory to SVN and committing to trunk."
-cd $SVNPATH/trunk/
-# Delete all files that should not now be added.
-svn status | grep -v "^.[ \t]*\..*" | grep "^\!" | awk '{print $2"@"}' | xargs svn del
-# Add all new files that are not set to be ignored
-svn status | grep -v "^.[ \t]*\..*" | grep "^?" | awk '{print $2"@"}' | xargs svn add
-svn commit --username=$WORDPRESS_USERNAME --password=$WORDPRESS_PASSWORD -m "Preparing for $PLUGINVERSION release"
+for SVN_DIR in $SVN_DIRS; do
+    SOURCE_DIR=${SVN_DIR/.}
+    TARGET_DIR=$TARGET${SOURCE_DIR/.svn}
+    TARGET_SVN_DIR=$TARGET${SVN_DIR/.}
+    if [ -d "$TARGET_DIR" ]; then
+        # Copy the .svn directory to trunk dir
+        cp -r $SVN_DIR $TARGET_SVN_DIR
+    fi
+done
 
-echo
+# Back to builds dir
+cd ../
 
-echo "Updating WordPress plugin repo assets and committing."
-cd $SVNPATH/assets/
-# Delete all new files that are not set to be ignored
-svn status | grep -v "^.[ \t]*\..*" | grep "^\!" | awk '{print $2"@"}' | xargs svn del
-# Add all new files that are not set to be ignored
-svn status | grep -v "^.[ \t]*\..*" | grep "^?" | awk '{print $2"@"}' | xargs svn add
-svn update --quiet --accept working $SVNPATH/assets/*
-svn commit --username=$WORDPRESS_USERNAME --password=$WORDPRESS_PASSWORD -m "Updating assets"
+# Remove checked out dir
+rm -fR svn-trunk
 
-echo
+# Add new version tag
+mkdir svn/tags/$VERSION
+rsync -r -p $PLUGIN/* svn/tags/$VERSION
 
-echo "Creating new SVN tag and committing it."
-cd $SVNPATH
-svn copy --quiet trunk/ tags/$PLUGINVERSION/
-# Remove assets and trunk directories from tag directory
-svn delete --force --quiet $SVNPATH/tags/$PLUGINVERSION/assets
-svn delete --force --quiet $SVNPATH/tags/$PLUGINVERSION/trunk
-svn update --quiet --accept working $SVNPATH/tags/$PLUGINVERSION
-cd $SVNPATH/tags/$PLUGINVERSION
-svn commit --username=$WORDPRESS_USERNAME --password=$WORDPRESS_PASSWORD -m "Tagging version $PLUGINVERSION"
+# Add new files to SVN
+svn stat svn | grep '^?' | awk '{print $2}' | xargs -I x svn add x@
+# Remove deleted files from SVN
+svn stat svn | grep '^!' | awk '{print $2}' | xargs -I x svn rm --force x@
+svn stat svn
 
-echo
+# Commit to SVN
+svn ci --no-auth-cache --username $WORDPRESS_USERNAME --password $WORDPRESS_PASSWORD svn -m "Deploy version $VERSION"
 
-echo "Removing temporary directory $SVNPATH."
-cd $SVNPATH
-cd ..
-rm -fr $SVNPATH/
-
-echo "*** FIN ***"
+# Remove SVN temp dir
+rm -fR svn
