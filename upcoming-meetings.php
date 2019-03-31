@@ -4,7 +4,7 @@ Plugin Name: Upcoming Meetings BMLT
 Plugin URI: https://wordpress.org/plugins/upcoming-meetings-bmlt/
 Author: pjaudiomv
 Description: This plugin returns all unique towns or counties for given service body on your site Simply add [list_locations] shortcode to your page and set shortcode attributes accordingly. Required attributes are root_server and services.
-Version: 1.1.3
+Version: 1.1.4
 Install: Drop this directory into the "wp-content/plugins/" directory and activate it.
 */
 /* Disallow direct access to the plugin file */
@@ -468,7 +468,7 @@ if (!class_exists("upcomingMeetings")) {
             $serviceBodies_results = json_decode($serviceBodiesURL, true);
             $results_count = count($serviceBodies_results);
 
-            if ($results_count != 0 && $results_count < $num_results) {
+            if ($results_count != 0 && $results_count < $num_results && is_array($serviceBodies_results)) {
                 $addtl_count_needed = $num_results - $results_count;
                 $serviceBodiesURL_addtl =  wp_remote_retrieve_body(wp_remote_get($root_server . "/client_interface/json/?switcher=GetSearchResults&weekdays=" . (date('w')+2) .$services_query. ($recursive == "1" ? "&recursive=1" : "")));
                 $serviceBodiesURL_addtl_json = json_decode($serviceBodiesURL_addtl, true);
@@ -478,7 +478,7 @@ if (!class_exists("upcomingMeetings")) {
                 $serviceBodiesURL_addtl =  wp_remote_retrieve_body(wp_remote_get($root_server . "/client_interface/json/?switcher=GetSearchResults&weekdays=" . (date('w')+2) .$services_query. ($recursive == "1" ? "&recursive=1" : "")));
                 $serviceBodiesURL_addtl_json = json_decode($serviceBodiesURL_addtl, true);
                 $final_result = array_slice($serviceBodiesURL_addtl_json, 0, $num_results);
-            } else { // if ($results_count >= $num_results) {
+            } else if ($results_count >= $num_results && is_array($serviceBodies_results)) {
                 $final_result = array_slice($serviceBodies_results, 0, $num_results);
             }
 
