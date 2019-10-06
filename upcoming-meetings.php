@@ -182,10 +182,11 @@ if (!class_exists("upcomingMeetings")) {
             if ($display_type != 'table' && $display_type != 'block') {
                 foreach ($meeting_results as $meeting) {
                     $output .= "<div class='upcoming-meetings-time-meeting-name'>" . date('g:i A', strtotime($meeting['start_time'])) . "&nbsp;&nbsp;&nbsp;" .$days_of_the_week[intval($meeting['weekday_tinyint'])]. "&nbsp;&nbsp;&nbsp;" .$meeting['meeting_name'] . "</div>";
+					$output .= "<div class'upcoming-meetings-location-name'>" . $meeting['location_text'] . "</div>";
                     $output .= "<div class='upcoming-meetings-location-address'>" . $meeting['location_street'] . "&nbsp;&nbsp;&nbsp;" . $meeting['location_municipality'] . ",&nbsp;" . $meeting['location_province'] . "&nbsp;" . $meeting['location_postal_code_1'] . '</div>';
                     $output .= "<div class='upcoming-meetings-formats-location-info-comments'>" . $meeting['formats'] . "&nbsp;&nbsp;&nbsp;" . $meeting['location_info'] . "&nbsp;" . $meeting['comments'] . '</div>';
                     $output .= "<div class='upcoming-meetings-map-link'>" . "<a href='https://maps.google.com/maps?q=" . $meeting['latitude'] . "," . $meeting['longitude'] . "' target='new'>Map</a></div>";
-                    $output .= "<div class='upcoming-meetings-break'>&nbsp;</div>";
+                    $output .= "<div class='upcoming-meetings-break'><hr></div>";
                 }
             }
             return $output;
