@@ -4,7 +4,7 @@ Plugin Name: Upcoming Meetings BMLT
 Plugin URI: https://wordpress.org/plugins/upcoming-meetings-bmlt/
 Author: pjaudiomv
 Description: This plugin returns all unique towns or counties for given service body on your site Simply add [list_locations] shortcode to your page and set shortcode attributes accordingly. Required attributes are root_server and services.
-Version: 1.1.3
+Version: 1.2.0
 Install: Drop this directory into the "wp-content/plugins/" directory and activate it.
 */
 /* Disallow direct access to the plugin file */
@@ -84,8 +84,8 @@ if (!class_exists("upcomingMeetings")) {
         }
 
         /**
-        * @param $hook
-        */
+         * @param $hook
+         */
         public function enqueueBackendFiles($hook)
         {
             if ($hook == 'settings_page_upcoming-meetings') {
@@ -100,7 +100,7 @@ if (!class_exists("upcomingMeetings")) {
 
         public function enqueueFrontendFiles($hook)
         {
-                wp_enqueue_style('upcoming-meetings', plugin_dir_url(__FILE__) . 'css/upcoming_meetings.css', false, '1.15', 'all');
+            wp_enqueue_style('upcoming-meetings', plugin_dir_url(__FILE__) . 'css/upcoming_meetings.css', false, '1.15', 'all');
         }
 
         public function testRootServer($root_server)
@@ -129,25 +129,27 @@ if (!class_exists("upcomingMeetings")) {
         {
             global $unique_areas;
             extract(shortcode_atts(array(
-                "root_server"  => '',
-                'services'     =>  '',
-                'recursive'    => '',
-                'grace_period' => '',
-                'num_results'  => '',
-                'timezone'     => '',
-                'display_type' => ''
+                "root_server"   => '',
+                'services'      =>  '',
+                'recursive'     => '',
+                'grace_period'  => '',
+                'num_results'   => '',
+                'timezone'      => '',
+                'display_type'  => '',
+                'location_text' => ''
             ), $atts));
 
             $area_data_dropdown   = explode(',', $this->options['service_body_dropdown']);
             $services_dropdown    = $area_data_dropdown[1];
 
-            $root_server          = ($root_server  != '' ? $root_server  : $this->options['root_server']);
-            $services             = ($services     != '' ? $services     : $services_dropdown);
-            $recursive            = ($recursive    != '' ? $recursive    : $this->options['recursive']);
-            $grace_period         = ($grace_period != '' ? $grace_period : $this->options['grace_period_dropdown']);
-            $num_results          = ($num_results  != '' ? $num_results  : $this->options['num_results_dropdown']);
-            $timezone             = ($timezone     != '' ? $timezone     : $this->options['timezones_dropdown']);
-            $display_type         = ($display_type != '' ? $display_type : $this->options['display_type_dropdown']);
+            $root_server          = ($root_server   != '' ? $root_server   : $this->options['root_server']);
+            $services             = ($services      != '' ? $services      : $services_dropdown);
+            $recursive            = ($recursive     != '' ? $recursive     : $this->options['recursive']);
+            $grace_period         = ($grace_period  != '' ? $grace_period  : $this->options['grace_period_dropdown']);
+            $num_results          = ($num_results   != '' ? $num_results   : $this->options['num_results_dropdown']);
+            $timezone             = ($timezone      != '' ? $timezone      : $this->options['timezones_dropdown']);
+            $display_type         = ($display_type  != '' ? $display_type  : $this->options['display_type_dropdown']);
+            $location_text        = ($location_text != '' ? $location_text : $this->options['location_text']);
 
             $days_of_the_week = [1 => "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -182,6 +184,9 @@ if (!class_exists("upcomingMeetings")) {
             if ($display_type != 'table' && $display_type != 'block') {
                 foreach ($meeting_results as $meeting) {
                     $output .= "<div class='upcoming-meetings-time-meeting-name'>" . date('g:i A', strtotime($meeting['start_time'])) . "&nbsp;&nbsp;&nbsp;" .$days_of_the_week[intval($meeting['weekday_tinyint'])]. "&nbsp;&nbsp;&nbsp;" .$meeting['meeting_name'] . "</div>";
+                    if ($location_text) {
+                        $output .= "<div class='upcoming-meetings-location-text'>" . $meeting['location_text'] . "</div>";
+                    }
                     $output .= "<div class='upcoming-meetings-location-address'>" . $meeting['location_street'] . "&nbsp;&nbsp;&nbsp;" . $meeting['location_municipality'] . ",&nbsp;" . $meeting['location_province'] . "&nbsp;" . $meeting['location_postal_code_1'] . '</div>';
                     $output .= "<div class='upcoming-meetings-formats-location-info-comments'>" . $meeting['formats'] . "&nbsp;&nbsp;&nbsp;" . $meeting['location_info'] . "&nbsp;" . $meeting['comments'] . '</div>';
                     $output .= "<div class='upcoming-meetings-map-link'>" . "<a href='https://maps.google.com/maps?q=" . $meeting['latitude'] . "," . $meeting['longitude'] . "' target='new'>Map</a></div>";
@@ -196,14 +201,14 @@ if (!class_exists("upcomingMeetings")) {
          */
         public function getAreas($root_server)
         {
-                $results = wp_remote_get("$root_server/client_interface/json/?switcher=GetServiceBodies", upcomingMeetings::HTTP_RETRIEVE_ARGS);
-                $result = json_decode(wp_remote_retrieve_body($results), true);
+            $results = wp_remote_get("$root_server/client_interface/json/?switcher=GetServiceBodies", upcomingMeetings::HTTP_RETRIEVE_ARGS);
+            $result = json_decode(wp_remote_retrieve_body($results), true);
             if (is_wp_error($results)) {
                 echo '<div style="font-size: 20px;text-align:center;font-weight:normal;color:#F00;margin:0 auto;margin-top: 30px;"><p>Problem Connecting to BMLT Root Server</p><p>' . $root_server . '</p><p>Error: ' . $result->get_error_message() . '</p><p>Please try again later</p></div>';
                 return 0;
             }
 
-                $unique_areas = array();
+            $unique_areas = array();
             foreach ($result as $value) {
                 $parent_name = 'None';
                 foreach ($result as $parent) {
@@ -248,6 +253,7 @@ if (!class_exists("upcomingMeetings")) {
                 $this->options['num_results_dropdown']   = sanitize_text_field($_POST['num_results_dropdown']);
                 $this->options['timezones_dropdown']     = sanitize_text_field($_POST['timezones_dropdown']);
                 $this->options['display_type_dropdown']  = sanitize_text_field($_POST['display_type_dropdown']);
+                $this->options['location_text']          = sanitize_text_field($_POST['location_text']);
                 $this->options['custom_css_um']          = $_POST['custom_css_um'];
 
                 $this->saveAdminOptions();
@@ -281,26 +287,26 @@ if (!class_exists("upcomingMeetings")) {
                             <li>
                                 <label for="service_body_dropdown">Default Service Body: </label>
                                 <select style="display:inline;" onchange="getUpcomingMeetingsValueSelected()" id="service_body_dropdown" name="service_body_dropdown" class="upcoming_meetings_service_body_select">
-                                <?php if ($this_connected) { ?>
-                                    <?php $unique_areas = $this->getAreas($this->options['root_server']); ?>
-                                    <?php asort($unique_areas); ?>
-                                    <?php foreach ($unique_areas as $key => $unique_area) { ?>
-                                        <?php $area_data          = explode(',', $unique_area); ?>
-                                        <?php $area_name          = $area_data[0]; ?>
-                                        <?php $area_id            = $area_data[1]; ?>
-                                        <?php $area_parent        = $area_data[2]; ?>
-                                        <?php $area_parent_name   = $area_data[3]; ?>
-                                        <?php $option_description = $area_name . " (" . $area_id . ") " . $area_parent_name . " (" . $area_parent . ")" ?></option>
-                                        <?php $is_data = explode(',', esc_html($this->options['service_body_dropdown'])); ?>
-                                        <?php if ($area_id == $is_data[1]) { ?>
-                                            <option selected="selected" value="<?php echo $unique_area; ?>"><?php echo $option_description; ?></option>
-                                        <?php } else { ?>
-                                            <option value="<?php echo $unique_area; ?>"><?php echo $option_description; ?></option>
+                                    <?php if ($this_connected) { ?>
+                                        <?php $unique_areas = $this->getAreas($this->options['root_server']); ?>
+                                        <?php asort($unique_areas); ?>
+                                        <?php foreach ($unique_areas as $key => $unique_area) { ?>
+                                            <?php $area_data          = explode(',', $unique_area); ?>
+                                            <?php $area_name          = $area_data[0]; ?>
+                                            <?php $area_id            = $area_data[1]; ?>
+                                            <?php $area_parent        = $area_data[2]; ?>
+                                            <?php $area_parent_name   = $area_data[3]; ?>
+                                            <?php $option_description = $area_name . " (" . $area_id . ") " . $area_parent_name . " (" . $area_parent . ")" ?></option>
+                                            <?php $is_data = explode(',', esc_html($this->options['service_body_dropdown'])); ?>
+                                            <?php if ($area_id == $is_data[1]) { ?>
+                                                <option selected="selected" value="<?php echo $unique_area; ?>"><?php echo $option_description; ?></option>
+                                            <?php } else { ?>
+                                                <option value="<?php echo $unique_area; ?>"><?php echo $option_description; ?></option>
+                                            <?php } ?>
                                         <?php } ?>
+                                    <?php } else { ?>
+                                        <option selected="selected" value="<?php echo $this->options['service_body_dropdown']; ?>"><?php echo 'Not Connected - Can not get Service Bodies'; ?></option>
                                     <?php } ?>
-                                <?php } else { ?>
-                                    <option selected="selected" value="<?php echo $this->options['service_body_dropdown']; ?>"><?php echo 'Not Connected - Can not get Service Bodies'; ?></option>
-                                <?php } ?>
                                 </select>
                                 <div style="display:inline; margin-left:15px;" id="txtSelectedValues1"></div>
                                 <p id="txtSelectedValues2"></p>
@@ -382,6 +388,12 @@ if (!class_exists("upcomingMeetings")) {
                                     ?>
                                 </select>
                             </li>
+                            <?php if ($this->options['display_type_dropdown'] === 'simple') { ?>
+                                <li>
+                                    <input type="checkbox" id="location_text" name="location_text" value="1" <?php echo ($this->options['location_text'] == "1" ? "checked" : "") ?>/>
+                                    <label for="location_text">Show Location Text (for simple display)</label>
+                                </li>
+                            <?php } ?>
                         </ul>
                     </div>
                     <div style="padding: 0 15px;" class="postbox">
@@ -429,7 +441,8 @@ if (!class_exists("upcomingMeetings")) {
                     'grace_period_dropdown'  => '15',
                     'num_results_dropdown'   => '5',
                     'timezones_dropdown'     => 'America/New_York',
-                    'display_type_dropdown'  => 'simple'
+                    'display_type_dropdown'  => 'simple',
+                    'location_text'          => '0'
                 );
                 update_option($this->optionsName, $theOptions);
             }
@@ -457,6 +470,7 @@ if (!class_exists("upcomingMeetings")) {
          */
         public function getMeetingsJson($root_server, $services, $timezone, $grace_period, $recursive, $num_results)
         {
+            $final_result = '';
             date_default_timezone_set($timezone);
             list($hour, $minute) = preg_split('/[:]/', date('G:i', strtotime('-' .$grace_period. 'minutes', strtotime(date('G:i')))));
             $serviceBodies = explode(',', $services);

@@ -5,8 +5,8 @@ Plugin URI: https://wordpress.org/plugins/upcoming-meetings-bmlt/
 Tags: bmlt, basic meeting list toolbox, Upcoming Meetings, Upcoming Meetings BMLT, narcotics anonymous, na
 Requires at least: 4.0
 Requires PHP: 5.6
-Tested up to: 5.2.2
-Stable tag: 1.1.3
+Tested up to: 5.2.3
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,7 +16,7 @@ Upcoming Meetings BMLT is a plugin that displays the next 'N' number of meetings
 
 SHORTCODE
 Basic: [upcoming_meetings]
-Attributes: root_server, services, recursive, grace_period, num_results, display_type, timezone
+Attributes: root_server, services, recursive, grace_period, num_results, display_type, timezone, location_text
 
 -- Shortcode parameters can be combined
 
@@ -43,6 +43,10 @@ Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot
 
 **timezone** This is required and should be set to what timezones your meetings are in, We can not rely on servers time zone. add timezone=&quot;America/New_York&quot; you can set this in the admin setting or short code. A complete list of timezones can be found here http://php.net/manual/en/timezones.php
 Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; timezone=&quot;America/New_York&quot;]
+
+**location_text** to display the location nam,e using the simple display add location_text=&quot;1&quot;
+Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot; timezone=&quot;America/New_York&quot; location_text=&quot;1&quot;]
+
 
 == EXAMPLES ==
 
@@ -75,6 +79,10 @@ This section describes how to install the plugin and get it working.
 4. screenshot-4.png
 
 == Changelog ==
+
+= 1.2.0 =
+
+* Added option to display the location name for the simple display.
 
 = 1.1.3 =
 

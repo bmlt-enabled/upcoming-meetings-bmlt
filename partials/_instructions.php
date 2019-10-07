@@ -5,7 +5,7 @@
     <div>
         <p>[upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;12&quot; timezone="America/New_York]</p>
         <p>Multiple service bodies can be added seperated by a comma like so services=&quot;12,14,15&quot;</p>
-        <strong>Attributes:</strong> root_server, services, recursive, grace_period, num_results, display_type, timezone
+        <strong>Attributes:</strong> root_server, services, recursive, grace_period, num_results, display_type, timezone, location_text
         <p><strong>Shortcode parameters can be combined.</strong></p>
     </div>
     <h3 class="help-accordian"><strong>Shortcode Attributes</strong></h3>
@@ -18,6 +18,7 @@
         <p><strong>num_results</strong></p>
         <p><strong>display_type</strong></p>
         <p><strong>timezone</strong></p>
+        <p><strong>location_text</strong></p>
         <p>A minimum of root_server, services and timezone attribute are required, which would return all towns for that service body seperated by a comma.</p>
         <p>Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot; timezone="America/New_York"]</p>
     </div>
@@ -62,5 +63,11 @@
         <p><strong>timezone</strong></p>
         <p>This is required and should be set to what timezones your meetings are in, We can not rely on servers time zone. add timezone="America/New_York" you can set this in the admin setting or short code. A complete list of timezones can be found here http://php.net/manual/en/timezones.php</p>
         <p>Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot; timezone="America/New_York" ]</p>
+    </div>
+    <h3 class="help-accordian"><strong>&nbsp;&nbsp;&nbsp;&nbsp;- location_text</strong></h3>
+    <div>
+        <p><strong>location_text</strong></p>
+        <p>**location_text** to display the location name using the simple display add location_text="1"</p>
+        <p>Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot; timezone="America/New_York" location_text=&quot;1&quot;]</p>
     </div>
 </div>
