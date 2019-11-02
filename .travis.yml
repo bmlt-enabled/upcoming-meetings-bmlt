@@ -50,6 +50,17 @@ jobs:
       file: "$DIST_DIR_GITHUB/$GITHUB_RELEASE_FILENAME"
       skip_cleanup: true
       name: "$TRAVIS_TAG"
+      condition: $TRAVIS_TAG =~ /^((?!beta).)*$/
+      on:
+        tags: true
+    - provider: releases
+      api_key:
+        secure: omNShqzlR9/OGaTS9uR4uE8rRuc5F1AVL+7wfQmeLfRj/EPpHvCaj/8Hdy8gwwex3eKUm+m/+Uf007rtCGyHtchF/Zme/KUpoA2/BAAvwmXtlr57sngOQTsnOhO0Ilhka3kV/qxcW52akiJ9XcUtWyWVfUDu6+QoIm2ehE2BcdjH7B4v7oTcOl+6j/EVaBGTu6WO992tvBJfwAyVmo7SPnUMh683aHfQdpofcpjKeQtUPJ2Ew0l/Zdk0R2wsNOAEwYGguUd/LuN1G+FNbk5DrW1Ybw4mRJanojvewSQAqQ5wnInLQQIFfyC/qj1gXAHzAi7Tv2O41PRR3c0V98GEY9srMOfgI/Q9nBl5kylNZjnc7C7hvyUusjk0jJjxVskYviqPgOIrj/2URUYqvCVfjpMnAKpfnwU5gIgTj8pUdrBTrdN9dI4yM7AXQy6AX8EF+cn2QDSfDBtr0BMYyQrVir2JU85HZZiWFs6NbwZtpJKLIicHuDHPpTZyWbSb4WWF8+BQNmRUjfMg8kesFbk58jwLBtAnPLTdMC40QAakdhKlqi/EGlZPY6XCDr8lagi1NOIrYJYj5186QgbFMN62TTq1frLHJN/Bc2cFfp54WhKQ6N4tX6plEco8jbW7DUVWmriNnf5kiTU7q5OZmMd1QEt0qejMsm8Dijci+pHKw4Y=
+      file: "$DIST_DIR_GITHUB/$GITHUB_RELEASE_FILENAME"
+      skip_cleanup: true
+      name: "$TRAVIS_TAG"
+      condition: $TRAVIS_TAG =~ /beta/
+      prerelease: true
       on:
         tags: true
     - provider: script
