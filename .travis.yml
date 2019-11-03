@@ -50,7 +50,7 @@ jobs:
       file: "$DIST_DIR_GITHUB/$GITHUB_RELEASE_FILENAME"
       skip_cleanup: true
       name: "$TRAVIS_TAG"
-      condition: $TRAVIS_TAG =~ /^((?!beta).)*$/
+      condition: $TRAVIS_TAG !~ /beta/
       on:
         tags: true
     - provider: releases
