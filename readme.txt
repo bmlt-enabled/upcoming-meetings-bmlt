@@ -80,6 +80,10 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+= 1.2.1 =
+
+* Update WordPress compatibility.
+
 = 1.2.0 =
 
 * Added option to display the location name for the simple display.
