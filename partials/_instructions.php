@@ -5,7 +5,7 @@
     <div>
         <p>[upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;12&quot; timezone="America/New_York]</p>
         <p>Multiple service bodies can be added seperated by a comma like so services=&quot;12,14,15&quot;</p>
-        <strong>Attributes:</strong> root_server, services, recursive, grace_period, num_results, display_type, timezone, location_text, time_format
+        <strong>Attributes:</strong> root_server, services, recursive, grace_period, num_results, display_type, timezone, location_text, time_format, weekday_language
         <p><strong>Shortcode parameters can be combined.</strong></p>
     </div>
     <h3 class="help-accordian"><strong>Shortcode Attributes</strong></h3>
@@ -20,6 +20,7 @@
         <p><strong>timezone</strong></p>
         <p><strong>location_text</strong></p>
         <p><strong>time_format</strong></p>
+        <p><strong>weekday_language</strong></p>
         <p>A minimum of root_server, services and timezone attribute are required, which would return all towns for that service body seperated by a comma.</p>
         <p>Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot; timezone="America/New_York"]</p>
     </div>
@@ -76,5 +77,11 @@
         <p><strong>time_format</strong></p>
         <p>This allows you to be able to switch between 12 and 24 hour. the default is 12. To switch to 24 hour add time_format="24"</p>
         <p>Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot; timezone="America/New_York" time_format=&quot;24"]</p>
+    </div>
+    <h3 class="help-accordian"><strong>&nbsp;&nbsp;&nbsp;&nbsp;- weekday_language</strong></h3>
+    <div>
+        <p><strong>weekday_language</strong></p>
+        <p>This allows you to change the language of the weekday names. To change language to danish set weekday_language="dk". Currently supported languages are Danish and English, the default is English.</p>
+        <p>Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot; timezone="America/New_York" weekday_language=&quot;dk"]</p>
     </div>
 </div>
