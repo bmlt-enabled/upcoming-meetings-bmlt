@@ -4,7 +4,7 @@ Plugin Name: Upcoming Meetings BMLT
 Plugin URI: https://wordpress.org/plugins/upcoming-meetings-bmlt/
 Author: pjaudiomv
 Description: This plugin returns all unique towns or counties for given service body on your site Simply add [list_locations] shortcode to your page and set shortcode attributes accordingly. Required attributes are root_server and services.
-Version: 1.2.1
+Version: 1.2.2
 Install: Drop this directory into the "wp-content/plugins/" directory and activate it.
 */
 /* Disallow direct access to the plugin file */
@@ -136,7 +136,8 @@ if (!class_exists("upcomingMeetings")) {
                 'num_results'   => '',
                 'timezone'      => '',
                 'display_type'  => '',
-                'location_text' => ''
+                'location_text' => '',
+                'time_format'   => ''
             ), $atts));
 
             $area_data_dropdown   = explode(',', $this->options['service_body_dropdown']);
@@ -150,6 +151,7 @@ if (!class_exists("upcomingMeetings")) {
             $timezone             = ($timezone      != '' ? $timezone      : $this->options['timezones_dropdown']);
             $display_type         = ($display_type  != '' ? $display_type  : $this->options['display_type_dropdown']);
             $location_text        = ($location_text != '' ? $location_text : $this->options['location_text']);
+            $time_format          = ($time_format   != '' ? $time_format   : $this->options['time_format_dropdown']);
 
             $days_of_the_week = [1 => "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -168,22 +170,27 @@ if (!class_exists("upcomingMeetings")) {
             $output .= "<style type='text/css'>$css_um</style>";
 
             $meeting_results = $this->getMeetingsJson($root_server, $services, $timezone, $grace_period, $recursive, $num_results);
+            if ($time_format == '24') {
+                $out_time_format = 'G:i';
+            } else {
+                $out_time_format = 'g:i a';
+            }
 
             if ($display_type != '' && $display_type == 'table') {
                 $output .= '<div id="upcoming_meetings_div">';
-                $output .= $this->meetingsJson2Html($meeting_results, false);
+                $output .= $this->meetingsJson2Html($meeting_results, false, null, $out_time_format);
                 $output .= '</div>';
             }
 
             if ($display_type != '' && $display_type == 'block') {
                 $output .= '<div id="upcoming_meetings_div">';
-                $output .= $this->meetingsJson2Html($meeting_results, true);
+                $output .= $this->meetingsJson2Html($meeting_results, true, null, $out_time_format);
                 $output .= '</div>';
             }
 
             if ($display_type != 'table' && $display_type != 'block') {
                 foreach ($meeting_results as $meeting) {
-                    $output .= "<div class='upcoming-meetings-time-meeting-name'>" . date('g:i A', strtotime($meeting['start_time'])) . "&nbsp;&nbsp;&nbsp;" .$days_of_the_week[intval($meeting['weekday_tinyint'])]. "&nbsp;&nbsp;&nbsp;" .$meeting['meeting_name'] . "</div>";
+                    $output .= "<div class='upcoming-meetings-time-meeting-name'>" . date($out_time_format, strtotime($meeting['start_time'])) . "&nbsp;&nbsp;&nbsp;" .$days_of_the_week[intval($meeting['weekday_tinyint'])]. "&nbsp;&nbsp;&nbsp;" .$meeting['meeting_name'] . "</div>";
                     if ($location_text) {
                         $output .= "<div class='upcoming-meetings-location-text'>" . $meeting['location_text'] . "</div>";
                     }
@@ -254,6 +261,7 @@ if (!class_exists("upcomingMeetings")) {
                 $this->options['timezones_dropdown']     = sanitize_text_field($_POST['timezones_dropdown']);
                 $this->options['display_type_dropdown']  = sanitize_text_field($_POST['display_type_dropdown']);
                 $this->options['location_text']          = sanitize_text_field($_POST['location_text']);
+                $this->options['time_format_dropdown']   = sanitize_text_field($_POST['time_format_dropdown']);
                 $this->options['custom_css_um']          = $_POST['custom_css_um'];
 
                 $this->saveAdminOptions();
@@ -357,6 +365,21 @@ if (!class_exists("upcomingMeetings")) {
                                 </select>
                             </li>
                             <li>
+                                <label for="time_format_dropdown">Time Format: </label>
+                                <select style="display:inline;" id="time_format_dropdown" name="time_format_dropdown"  class="time_format_select">
+                                    <?php if ($this->options['time_format_dropdown'] == '24') { ?>
+                                        <option selected="selected" value="24">24 Hour</option>
+                                        <option value="12">12 Hour</option>
+                                        <?php
+                                    } else { ?>
+                                        <option value="24">24 Hour</option>
+                                        <option selected="selected" value="12">12 Hour</option>
+                                        <?php
+                                    }
+                                    ?>
+                                </select>
+                            </li>
+                            <li>
                                 <label for="num_results_dropdown">Number of Results: </label>
                                 <select style="display:inline;" id="num_results_dropdown" name="num_results_dropdown"  class="list_by_select">
                                     <?php
@@ -416,6 +439,9 @@ if (!class_exists("upcomingMeetings")) {
 
         /**
          * @desc Adds the Settings link to the plugin activate/deactivate page
+         * @param $links
+         * @param $file
+         * @return mixed
          */
         public function filterPluginActions($links, $file)
         {
@@ -442,7 +468,8 @@ if (!class_exists("upcomingMeetings")) {
                     'num_results_dropdown'   => '5',
                     'timezones_dropdown'     => 'America/New_York',
                     'display_type_dropdown'  => 'simple',
-                    'location_text'          => '0'
+                    'location_text'          => '0',
+                    'time_format'            => '12'
                 );
                 update_option($this->optionsName, $theOptions);
             }
@@ -466,7 +493,7 @@ if (!class_exists("upcomingMeetings")) {
          * @param $grace_period
          * @param $recursive
          * @param $num_results
-         * @return string
+         * @return array
          */
         public function getMeetingsJson($root_server, $services, $timezone, $grace_period, $recursive, $num_results)
         {
@@ -501,13 +528,19 @@ if (!class_exists("upcomingMeetings")) {
 
         /*******************************************************************/
         /**
-        \brief  This returns the search results, in whatever form was requested.
-        \returns XHTML data. It will either be a table, or block elements.
+         * \brief  This returns the search results, in whatever form was requested.
+         * \returns XHTML data. It will either be a table, or block elements.
+         * @param $results
+         * @param bool $in_block
+         * @param null $in_container_id
+         * @param null $in_time_format
+         * @return string
          */
         public function meetingsJson2Html(
-            $results,               ///< The results.
-            $in_block = false,      ///< If this is true, the results will be sent back as block elements (div tags), as opposed to a table. Default is false.
-            $in_container_id = null ///< This is an optional ID for the "wrapper."
+            $results,                ///< The results.
+            $in_block = false,       ///< If this is true, the results will be sent back as block elements (div tags), as opposed to a table. Default is false.
+            $in_container_id = null, ///< This is an optional ID for the "wrapper."
+            $in_time_format = null  // Time format
         ) {
             $current_weekday = -1;
             $days_of_the_week = [1 => "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -603,7 +636,7 @@ if (!class_exists("upcomingMeetings")) {
                                 }
 
                                 $weekday = htmlspecialchars($days_of_the_week[intval($meeting['weekday_tinyint'])]);
-                                $time = $this->buildMeetingTime($meeting['start_time']);
+                                $time = $this->buildMeetingTime($meeting['start_time'], $in_time_format);
 
                                 $address = '';
                                 $location_text = htmlspecialchars(trim(stripslashes($meeting['location_text'])));
@@ -716,20 +749,23 @@ if (!class_exists("upcomingMeetings")) {
 
         /*******************************************************************/
         /** \brief This creates a time string to be displayed for the meeting.
-        The display is done in non-military time, and "midnight" and
-        "noon" are substituted for 12:59:00, 00:00:00 and 12:00:00
-
-        \returns a string, containing the HTML rendered by the function.
+         * The display is done in non-military time, and "midnight" and
+         * "noon" are substituted for 12:59:00, 00:00:00 and 12:00:00
+         *
+         * \returns a string, containing the HTML rendered by the function.
+         * @param $in_time
+         * @param $time_format
+         * @return string
          */
-        public function buildMeetingTime( $in_time ///< A string. The value of the time field.
+        public function buildMeetingTime( $in_time, $time_format ///< A string. The value of the time field.
         )
         {
-            $time_format = 'g:i A';
+
             $time = null;
 
-            if (($in_time == "00:00:00") || ($in_time >= "23:55:00")) {
+            if (($in_time == "00:00:00") || ($in_time >= "23:55:00") && $time_format == 'g:i A') {
                 $time = htmlspecialchars('Midnight');
-            } elseif ($in_time == "12:00:00") {
+            } elseif ($in_time == "12:00:00" && $time_format == 'g:i A') {
                 $time = htmlspecialchars('Noon');
             } else {
                 $time = htmlspecialchars(date($time_format, strtotime($in_time)));

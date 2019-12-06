@@ -6,7 +6,7 @@ Tags: bmlt, basic meeting list toolbox, Upcoming Meetings, Upcoming Meetings BML
 Requires at least: 4.0
 Requires PHP: 5.6
 Tested up to: 5.3
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,7 +16,7 @@ Upcoming Meetings BMLT is a plugin that displays the next 'N' number of meetings
 
 SHORTCODE
 Basic: [upcoming_meetings]
-Attributes: root_server, services, recursive, grace_period, num_results, display_type, timezone, location_text
+Attributes: root_server, services, recursive, grace_period, num_results, display_type, timezone, location_text, time_format
 
 -- Shortcode parameters can be combined
 
@@ -47,6 +47,8 @@ Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot
 **location_text** to display the location nam,e using the simple display add location_text=&quot;1&quot;
 Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot; timezone=&quot;America/New_York&quot; location_text=&quot;1&quot;]
 
+**time_format** This allows you to be able to switch between 12 and 24 hour. the default is 12. To switch to 24 hour add time_format=&quot;24&quot;
+Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; timezone=&quot;America/New_York&quot; time_format=&quot;24&quot;]
 
 == EXAMPLES ==
 
@@ -79,6 +81,10 @@ This section describes how to install the plugin and get it working.
 4. screenshot-4.png
 
 == Changelog ==
+
+= 1.2.2 =
+
+* Added time_format option to be able to change between 12 or 24 hour.
 
 = 1.2.1 =
 
