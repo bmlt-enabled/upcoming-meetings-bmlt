@@ -4,7 +4,7 @@ Plugin Name: Upcoming Meetings BMLT
 Plugin URI: https://wordpress.org/plugins/upcoming-meetings-bmlt/
 Author: pjaudiomv
 Description: This plugin returns all unique towns or counties for given service body on your site Simply add [list_locations] shortcode to your page and set shortcode attributes accordingly. Required attributes are root_server and services.
-Version: 1.2.2
+Version: 1.2.3
 Install: Drop this directory into the "wp-content/plugins/" directory and activate it.
 */
 /* Disallow direct access to the plugin file */
@@ -129,31 +129,37 @@ if (!class_exists("upcomingMeetings")) {
         {
             global $unique_areas;
             extract(shortcode_atts(array(
-                "root_server"   => '',
-                'services'      =>  '',
-                'recursive'     => '',
-                'grace_period'  => '',
-                'num_results'   => '',
-                'timezone'      => '',
-                'display_type'  => '',
-                'location_text' => '',
-                'time_format'   => ''
+                "root_server"       => '',
+                'services'          =>  '',
+                'recursive'         => '',
+                'grace_period'      => '',
+                'num_results'       => '',
+                'timezone'          => '',
+                'display_type'      => '',
+                'location_text'     => '',
+                'time_format'       => '',
+                'weekday_language'  => ''
             ), $atts));
 
             $area_data_dropdown   = explode(',', $this->options['service_body_dropdown']);
             $services_dropdown    = $area_data_dropdown[1];
 
-            $root_server          = ($root_server   != '' ? $root_server   : $this->options['root_server']);
-            $services             = ($services      != '' ? $services      : $services_dropdown);
-            $recursive            = ($recursive     != '' ? $recursive     : $this->options['recursive']);
-            $grace_period         = ($grace_period  != '' ? $grace_period  : $this->options['grace_period_dropdown']);
-            $num_results          = ($num_results   != '' ? $num_results   : $this->options['num_results_dropdown']);
-            $timezone             = ($timezone      != '' ? $timezone      : $this->options['timezones_dropdown']);
-            $display_type         = ($display_type  != '' ? $display_type  : $this->options['display_type_dropdown']);
-            $location_text        = ($location_text != '' ? $location_text : $this->options['location_text']);
-            $time_format          = ($time_format   != '' ? $time_format   : $this->options['time_format_dropdown']);
+            $root_server          = ($root_server       != '' ? $root_server       : $this->options['root_server']);
+            $services             = ($services          != '' ? $services          : $services_dropdown);
+            $recursive            = ($recursive         != '' ? $recursive         : $this->options['recursive']);
+            $grace_period         = ($grace_period      != '' ? $grace_period      : $this->options['grace_period_dropdown']);
+            $num_results          = ($num_results       != '' ? $num_results       : $this->options['num_results_dropdown']);
+            $timezone             = ($timezone          != '' ? $timezone          : $this->options['timezones_dropdown']);
+            $display_type         = ($display_type      != '' ? $display_type      : $this->options['display_type_dropdown']);
+            $location_text        = ($location_text     != '' ? $location_text     : $this->options['location_text']);
+            $time_format          = ($time_format       != '' ? $time_format       : $this->options['time_format_dropdown']);
+            $weekday_language     = ($weekday_language  != '' ? $weekday_language  : $this->options['weekday_language_dropdown']);
 
-            $days_of_the_week = [1 => "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            if ($weekday_language == 'dk') {
+                $days_of_the_week = [1 => "Søndag", "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag"];
+            } else {
+                $days_of_the_week = [1 => "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            }
 
             date_default_timezone_set($timezone);
 
@@ -178,13 +184,13 @@ if (!class_exists("upcomingMeetings")) {
 
             if ($display_type != '' && $display_type == 'table') {
                 $output .= '<div id="upcoming_meetings_div">';
-                $output .= $this->meetingsJson2Html($meeting_results, false, null, $out_time_format);
+                $output .= $this->meetingsJson2Html($meeting_results, false, null, $out_time_format, $days_of_the_week);
                 $output .= '</div>';
             }
 
             if ($display_type != '' && $display_type == 'block') {
                 $output .= '<div id="upcoming_meetings_div">';
-                $output .= $this->meetingsJson2Html($meeting_results, true, null, $out_time_format);
+                $output .= $this->meetingsJson2Html($meeting_results, true, null, $out_time_format, $days_of_the_week);
                 $output .= '</div>';
             }
 
@@ -253,16 +259,17 @@ if (!class_exists("upcomingMeetings")) {
                 if (!wp_verify_nonce($_POST['_wpnonce'], 'upcomingmeetingsupdate-options')) {
                     die('Whoops! There was a problem with the data you posted. Please go back and try again.');
                 }
-                $this->options['root_server']            = esc_url_raw($_POST['root_server']);
-                $this->options['service_body_dropdown']  = sanitize_text_field($_POST['service_body_dropdown']);
-                $this->options['recursive']              = sanitize_text_field($_POST['recursive']);
-                $this->options['grace_period_dropdown']  = sanitize_text_field($_POST['grace_period_dropdown']);
-                $this->options['num_results_dropdown']   = sanitize_text_field($_POST['num_results_dropdown']);
-                $this->options['timezones_dropdown']     = sanitize_text_field($_POST['timezones_dropdown']);
-                $this->options['display_type_dropdown']  = sanitize_text_field($_POST['display_type_dropdown']);
-                $this->options['location_text']          = sanitize_text_field($_POST['location_text']);
-                $this->options['time_format_dropdown']   = sanitize_text_field($_POST['time_format_dropdown']);
-                $this->options['custom_css_um']          = $_POST['custom_css_um'];
+                $this->options['root_server']                = esc_url_raw($_POST['root_server']);
+                $this->options['service_body_dropdown']      = sanitize_text_field($_POST['service_body_dropdown']);
+                $this->options['recursive']                  = sanitize_text_field($_POST['recursive']);
+                $this->options['grace_period_dropdown']      = sanitize_text_field($_POST['grace_period_dropdown']);
+                $this->options['num_results_dropdown']       = sanitize_text_field($_POST['num_results_dropdown']);
+                $this->options['timezones_dropdown']         = sanitize_text_field($_POST['timezones_dropdown']);
+                $this->options['display_type_dropdown']      = sanitize_text_field($_POST['display_type_dropdown']);
+                $this->options['location_text']              = sanitize_text_field($_POST['location_text']);
+                $this->options['time_format_dropdown']       = sanitize_text_field($_POST['time_format_dropdown']);
+                $this->options['weekday_language_dropdown']  = sanitize_text_field($_POST['weekday_language_dropdown']);
+                $this->options['custom_css_um']               = $_POST['custom_css_um'];
 
                 $this->saveAdminOptions();
                 echo '<div class="updated"><p>Success! Your changes were successfully saved!</p></div>';
@@ -380,6 +387,21 @@ if (!class_exists("upcomingMeetings")) {
                                 </select>
                             </li>
                             <li>
+                                <label for="weekday_language_dropdown">Weekday Language: </label>
+                                <select style="display:inline;" id="weekday_language_dropdown" name="weekday_language_dropdown"  class="weekday_language_select">
+                                    <?php if ($this->options['weekday_language_dropdown'] == 'dk') { ?>
+                                        <option selected="selected" value="dk">Danish</option>
+                                        <option value="en">English</option>
+                                        <?php
+                                    } else { ?>
+                                        <option value="dk">Danish</option>
+                                        <option selected="selected" value="en">English</option>
+                                        <?php
+                                    }
+                                    ?>
+                                </select>
+                            </li>
+                            <li>
                                 <label for="num_results_dropdown">Number of Results: </label>
                                 <select style="display:inline;" id="num_results_dropdown" name="num_results_dropdown"  class="list_by_select">
                                     <?php
@@ -461,15 +483,16 @@ if (!class_exists("upcomingMeetings")) {
             // Don't forget to set up the default options
             if (!$theOptions = get_option($this->optionsName)) {
                 $theOptions = array(
-                    "root_server"            => '',
-                    "service_body_dropdown"  => '',
-                    'recursive'              => '0',
-                    'grace_period_dropdown'  => '15',
-                    'num_results_dropdown'   => '5',
-                    'timezones_dropdown'     => 'America/New_York',
-                    'display_type_dropdown'  => 'simple',
-                    'location_text'          => '0',
-                    'time_format'            => '12'
+                    "root_server"               => '',
+                    "service_body_dropdown"     => '',
+                    'recursive'                 => '0',
+                    'grace_period_dropdown'     => '15',
+                    'num_results_dropdown'      => '5',
+                    'timezones_dropdown'        => 'America/New_York',
+                    'display_type_dropdown'     => 'simple',
+                    'location_text'             => '0',
+                    'time_format'               => '12',
+                    'weekday_language_dropdown' => 'en'
                 );
                 update_option($this->optionsName, $theOptions);
             }
@@ -534,16 +557,17 @@ if (!class_exists("upcomingMeetings")) {
          * @param bool $in_block
          * @param null $in_container_id
          * @param null $in_time_format
+         * @param null $days_of_the_week
          * @return string
          */
         public function meetingsJson2Html(
             $results,                ///< The results.
             $in_block = false,       ///< If this is true, the results will be sent back as block elements (div tags), as opposed to a table. Default is false.
             $in_container_id = null, ///< This is an optional ID for the "wrapper."
-            $in_time_format = null  // Time format
+            $in_time_format = null,  // Time format
+            $days_of_the_week = null
         ) {
             $current_weekday = -1;
-            $days_of_the_week = [1 => "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
             $ret = '';
 

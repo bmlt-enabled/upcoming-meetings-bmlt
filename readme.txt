@@ -6,7 +6,7 @@ Tags: bmlt, basic meeting list toolbox, Upcoming Meetings, Upcoming Meetings BML
 Requires at least: 4.0
 Requires PHP: 5.6
 Tested up to: 5.3
-Stable tag: 1.2.2
+Stable tag: 1.2.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,7 +16,7 @@ Upcoming Meetings BMLT is a plugin that displays the next 'N' number of meetings
 
 SHORTCODE
 Basic: [upcoming_meetings]
-Attributes: root_server, services, recursive, grace_period, num_results, display_type, timezone, location_text, time_format
+Attributes: root_server, services, recursive, grace_period, num_results, display_type, timezone, location_text, time_format, weekday_language
 
 -- Shortcode parameters can be combined
 
@@ -50,6 +50,9 @@ Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot
 **time_format** This allows you to be able to switch between 12 and 24 hour. the default is 12. To switch to 24 hour add time_format=&quot;24&quot;
 Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; timezone=&quot;America/New_York&quot; time_format=&quot;24&quot;]
 
+**weekday_language** This allows you to change the language of the weekday names. To change language to danish set weekday_language=&quot;dk&quot;. Currently supported languages are Danish and English, the default is English.
+Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; timezone=&quot;America/New_York&quot; weekday_language=&quot;dk&quot;]
+
 == EXAMPLES ==
 
 <a href="https://sca.charlestonna.org/upcoming-meetings/">https://sca.charlestonna.org/upcoming-meetings/</a>
@@ -81,6 +84,10 @@ This section describes how to install the plugin and get it working.
 4. screenshot-4.png
 
 == Changelog ==
+
+= 1.2.2 =
+
+* Added weekday_language support for Danish.
 
 = 1.2.2 =
 
