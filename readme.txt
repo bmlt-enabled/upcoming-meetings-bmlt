@@ -85,6 +85,10 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+= 1.2.5 =
+
+* Now defaults timezone to WordPRess settings if not set.
+
 = 1.2.4 =
 
 * Added divider between meetings for simple layout.
