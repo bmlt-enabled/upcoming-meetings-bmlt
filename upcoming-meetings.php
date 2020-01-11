@@ -4,7 +4,7 @@ Plugin Name: Upcoming Meetings BMLT
 Plugin URI: https://wordpress.org/plugins/upcoming-meetings-bmlt/
 Author: pjaudiomv
 Description: This plugin returns all unique towns or counties for given service body on your site Simply add [list_locations] shortcode to your page and set shortcode attributes accordingly. Required attributes are root_server and services.
-Version: 1.2.4
+Version: 1.2.5
 Install: Drop this directory into the "wp-content/plugins/" directory and activate it.
 */
 /* Disallow direct access to the plugin file */
@@ -483,6 +483,7 @@ if (!class_exists("upcomingMeetings")) {
         public function getOptions()
         {
             // Don't forget to set up the default options
+            $wordpressTimeZone = get_option('timezone_string');
             if (!$theOptions = get_option($this->optionsName)) {
                 $theOptions = array(
                     "root_server"               => '',
@@ -490,7 +491,7 @@ if (!class_exists("upcomingMeetings")) {
                     'recursive'                 => '0',
                     'grace_period_dropdown'     => '15',
                     'num_results_dropdown'      => '5',
-                    'timezones_dropdown'        => 'America/New_York',
+                    'timezones_dropdown'        => $wordpressTimeZone,
                     'display_type_dropdown'     => 'simple',
                     'location_text'             => '0',
                     'time_format'               => '12',
