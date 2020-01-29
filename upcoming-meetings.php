@@ -4,7 +4,7 @@ Plugin Name: Upcoming Meetings BMLT
 Plugin URI: https://wordpress.org/plugins/upcoming-meetings-bmlt/
 Author: pjaudiomv
 Description: This plugin returns all unique towns or counties for given service body on your site Simply add [list_locations] shortcode to your page and set shortcode attributes accordingly. Required attributes are root_server and services.
-Version: 1.2.5
+Version: 1.2.6
 Install: Drop this directory into the "wp-content/plugins/" directory and activate it.
 */
 /* Disallow direct access to the plugin file */
@@ -127,33 +127,35 @@ if (!class_exists("upcomingMeetings")) {
 
         public function upcomingMeetingsMain($atts, $content = null)
         {
-            global $unique_areas;
-            extract(shortcode_atts(array(
-                "root_server"       => '',
-                'services'          =>  '',
-                'recursive'         => '',
-                'grace_period'      => '',
-                'num_results'       => '',
-                'timezone'          => '',
-                'display_type'      => '',
-                'location_text'     => '',
-                'time_format'       => '',
-                'weekday_language'  => ''
-            ), $atts));
+            $args = shortcode_atts(
+                array(
+                    "root_server"       => '',
+                    'services'          =>  '',
+                    'recursive'         => '',
+                    'grace_period'      => '',
+                    'num_results'       => '',
+                    'timezone'          => '',
+                    'display_type'      => '',
+                    'location_text'     => '',
+                    'time_format'       => '',
+                    'weekday_language'  => ''
+                ),
+                $atts
+            );
 
             $area_data_dropdown   = explode(',', $this->options['service_body_dropdown']);
             $services_dropdown    = $area_data_dropdown[1];
 
-            $root_server          = ($root_server       != '' ? $root_server       : $this->options['root_server']);
-            $services             = ($services          != '' ? $services          : $services_dropdown);
-            $recursive            = ($recursive         != '' ? $recursive         : $this->options['recursive']);
-            $grace_period         = ($grace_period      != '' ? $grace_period      : $this->options['grace_period_dropdown']);
-            $num_results          = ($num_results       != '' ? $num_results       : $this->options['num_results_dropdown']);
-            $timezone             = ($timezone          != '' ? $timezone          : $this->options['timezones_dropdown']);
-            $display_type         = ($display_type      != '' ? $display_type      : $this->options['display_type_dropdown']);
-            $location_text        = ($location_text     != '' ? $location_text     : $this->options['location_text']);
-            $time_format          = ($time_format       != '' ? $time_format       : $this->options['time_format_dropdown']);
-            $weekday_language     = ($weekday_language  != '' ? $weekday_language  : $this->options['weekday_language_dropdown']);
+            $root_server          = ($args['root_server']       != '' ? $args['root_server']       : $this->options['root_server']);
+            $services             = ($args['services']          != '' ? $args['services']          : $services_dropdown);
+            $recursive            = ($args['recursive']         != '' ? $args['recursive']         : $this->options['recursive']);
+            $grace_period         = ($args['grace_period']      != '' ? $args['grace_period']      : $this->options['grace_period_dropdown']);
+            $num_results          = ($args['num_results']       != '' ? $args['num_results']       : $this->options['num_results_dropdown']);
+            $timezone             = ($args['timezone']          != '' ? $args['timezone']          : $this->options['timezones_dropdown']);
+            $display_type         = ($args['display_type']      != '' ? $args['display_type']      : $this->options['display_type_dropdown']);
+            $location_text        = ($args['location_text']     != '' ? $args['location_text']     : $this->options['location_text']);
+            $time_format          = ($args['time_format']       != '' ? $args['time_format']       : $this->options['time_format_dropdown']);
+            $weekday_language     = ($args['weekday_language']  != '' ? $args['weekday_language']  : $this->options['weekday_language_dropdown']);
 
             if ($weekday_language == 'dk') {
                 $days_of_the_week = [1 => "Søndag", "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag"];
