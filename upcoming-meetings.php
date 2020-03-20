@@ -4,7 +4,7 @@ Plugin Name: Upcoming Meetings BMLT
 Plugin URI: https://wordpress.org/plugins/upcoming-meetings-bmlt/
 Author: pjaudiomv
 Description: Upcoming Meetings BMLT is a plugin that displays the next 'N' number of meetings from the current time on your page or in a widget using the upcoming_meetings shortcode.
-Version: 1.3.0
+Version: 1.3.1
 Install: Drop this directory into the "wp-content/plugins/" directory and activate it.
 */
 /* Disallow direct access to the plugin file */
@@ -200,6 +200,8 @@ if (!class_exists("upcomingMeetings")) {
 
             if ($display_type != 'table' && $display_type != 'block') {
                 foreach ($meeting_results as $meeting) {
+                    $url = '~(?:(https?)://([^\s<]+)|(www\.[^\s<]+?\.[^\s<]+))(?<![\.,:])~i';
+                    $meeting['location_info'] = preg_replace($url, '<a href="$0" target="_blank" title="$0">$0</a>', $meeting['location_info']);
                     $output .= "<div class='upcoming-meetings-time-meeting-name'>" . date($out_time_format, strtotime($meeting['start_time'])) . "&nbsp;&nbsp;&nbsp;" .$days_of_the_week[intval($meeting['weekday_tinyint'])]. "&nbsp;&nbsp;&nbsp;" .$meeting['meeting_name'] . "</div>";
                     if ($location_text) {
                         $output .= "<div class='upcoming-meetings-location-text'>" . $meeting['location_text'] . "</div>";
@@ -681,6 +683,8 @@ if (!class_exists("upcomingMeetings")) {
                                 $weekday = htmlspecialchars($days_of_the_week[intval($meeting['weekday_tinyint'])]);
                                 $time = $this->buildMeetingTime($meeting['start_time'], $in_time_format);
 
+                                $url = '~(?:(https?)://([^\s<]+)|(www\.[^\s<]+?\.[^\s<]+))(?<![\.,:])~i';
+                                $meeting['location_info'] = preg_replace($url, '<a href="$0" target="_blank" title="$0">$0</a>', $meeting['location_info']);
                                 $address = '';
                                 $location_text = htmlspecialchars(trim(stripslashes($meeting['location_text'])));
                                 $street = htmlspecialchars(trim(stripslashes($meeting['location_street'])));
