@@ -3,8 +3,8 @@
 Plugin Name: Upcoming Meetings BMLT
 Plugin URI: https://wordpress.org/plugins/upcoming-meetings-bmlt/
 Author: pjaudiomv
-Description: This plugin returns all unique towns or counties for given service body on your site Simply add [list_locations] shortcode to your page and set shortcode attributes accordingly. Required attributes are root_server and services.
-Version: 1.2.6
+Description: Upcoming Meetings BMLT is a plugin that displays the next 'N' number of meetings from the current time on your page or in a widget using the upcoming_meetings shortcode.
+Version: 1.3.0
 Install: Drop this directory into the "wp-content/plugins/" directory and activate it.
 */
 /* Disallow direct access to the plugin file */
@@ -138,7 +138,8 @@ if (!class_exists("upcomingMeetings")) {
                     'display_type'      => '',
                     'location_text'     => '',
                     'time_format'       => '',
-                    'weekday_language'  => ''
+                    'weekday_language'  => '',
+                    'custom_query'      => ''
                 ),
                 $atts
             );
@@ -156,6 +157,7 @@ if (!class_exists("upcomingMeetings")) {
             $location_text        = ($args['location_text']     != '' ? $args['location_text']     : $this->options['location_text']);
             $time_format          = ($args['time_format']       != '' ? $args['time_format']       : $this->options['time_format_dropdown']);
             $weekday_language     = ($args['weekday_language']  != '' ? $args['weekday_language']  : $this->options['weekday_language_dropdown']);
+            $custom_query         = ($args['custom_query']      != '' ? $args['custom_query']      : $this->options['custom_query']);
 
             if ($weekday_language == 'dk') {
                 $days_of_the_week = [1 => "Søndag", "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag"];
@@ -177,7 +179,7 @@ if (!class_exists("upcomingMeetings")) {
 
             $output .= "<style type='text/css'>$css_um</style>";
 
-            $meeting_results = $this->getMeetingsJson($root_server, $services, $timezone, $grace_period, $recursive, $num_results);
+            $meeting_results = $this->getMeetingsJson($root_server, $services, $timezone, $grace_period, $recursive, $num_results, $custom_query);
             if ($time_format == '24') {
                 $out_time_format = 'G:i';
             } else {
@@ -273,7 +275,8 @@ if (!class_exists("upcomingMeetings")) {
                 $this->options['location_text']              = sanitize_text_field($_POST['location_text']);
                 $this->options['time_format_dropdown']       = sanitize_text_field($_POST['time_format_dropdown']);
                 $this->options['weekday_language_dropdown']  = sanitize_text_field($_POST['weekday_language_dropdown']);
-                $this->options['custom_css_um']               = $_POST['custom_css_um'];
+                $this->options['custom_query']               = sanitize_text_field($_POST['custom_query']);
+                $this->options['custom_css_um']              = $_POST['custom_css_um'];
 
                 $this->saveAdminOptions();
                 echo '<div class="updated"><p>Success! Your changes were successfully saved!</p></div>';
@@ -446,6 +449,15 @@ if (!class_exists("upcomingMeetings")) {
                         </ul>
                     </div>
                     <div style="padding: 0 15px;" class="postbox">
+                        <h3>Custom Query</h3>
+                        <p>Ex. &formats=54</p>
+                        <ul>
+                            <li>
+                                <input type="text" id="custom_query" name="custom_query" value="<?php echo $this->options['custom_query']; ?>">
+                            </li>
+                        </ul>
+                    </div>
+                    <div style="padding: 0 15px;" class="postbox">
                         <h3>Custom CSS</h3>
                         <p>Allows for custom styling of Upcoming Meetings.</p>
                         <ul>
@@ -497,7 +509,8 @@ if (!class_exists("upcomingMeetings")) {
                     'display_type_dropdown'     => 'simple',
                     'location_text'             => '0',
                     'time_format'               => '12',
-                    'weekday_language_dropdown' => 'en'
+                    'weekday_language_dropdown' => 'en',
+                    'custom_query'              => ''
                 );
                 update_option($this->optionsName, $theOptions);
             }
@@ -521,9 +534,10 @@ if (!class_exists("upcomingMeetings")) {
          * @param $grace_period
          * @param $recursive
          * @param $num_results
+         * @param $custom_query
          * @return array
          */
-        public function getMeetingsJson($root_server, $services, $timezone, $grace_period, $recursive, $num_results)
+        public function getMeetingsJson($root_server, $services, $timezone, $grace_period, $recursive, $num_results, $custom_query)
         {
             $final_result = '';
             date_default_timezone_set($timezone);
@@ -533,18 +547,18 @@ if (!class_exists("upcomingMeetings")) {
             foreach ($serviceBodies as $serviceBody) {
                 $services_query .= '&services[]=' . $serviceBody;
             }
-            $serviceBodiesURL =  wp_remote_retrieve_body(wp_remote_get($root_server . "/client_interface/json/?switcher=GetSearchResults&weekdays=" . (date('w')+1) .$services_query. "&StartsAfterH=" .$hour. "&StartsAfterM=" .$minute. ($recursive == "1" ? "&recursive=1" : "")));
+            $serviceBodiesURL =  wp_remote_retrieve_body(wp_remote_get($root_server . "/client_interface/json/?switcher=GetSearchResults&weekdays=" . (date('w')+1) .$services_query. "&StartsAfterH=" .$hour. "&StartsAfterM=" .$minute. $custom_query .($recursive == "1" ? "&recursive=1" : "")));
             $serviceBodies_results = json_decode($serviceBodiesURL, true);
             $results_count = count($serviceBodies_results);
 
             if ($results_count != 0 && $results_count < $num_results && is_array($serviceBodies_results)) {
                 $addtl_count_needed = $num_results - $results_count;
-                $serviceBodiesURL_addtl =  wp_remote_retrieve_body(wp_remote_get($root_server . "/client_interface/json/?switcher=GetSearchResults&weekdays=" . (date('w')+2) .$services_query. ($recursive == "1" ? "&recursive=1" : "")));
+                $serviceBodiesURL_addtl =  wp_remote_retrieve_body(wp_remote_get($root_server . "/client_interface/json/?switcher=GetSearchResults&weekdays=" . (date('w')+2) .$services_query. $custom_query .($recursive == "1" ? "&recursive=1" : "")));
                 $serviceBodiesURL_addtl_json = json_decode($serviceBodiesURL_addtl, true);
                 $added_results = array_slice($serviceBodiesURL_addtl_json, 0, $addtl_count_needed);
                 $final_result = array_merge($serviceBodies_results, $added_results);
             } else if ($results_count == 0) {
-                $serviceBodiesURL_addtl =  wp_remote_retrieve_body(wp_remote_get($root_server . "/client_interface/json/?switcher=GetSearchResults&weekdays=" . (date('w')+2) .$services_query. ($recursive == "1" ? "&recursive=1" : "")));
+                $serviceBodiesURL_addtl =  wp_remote_retrieve_body(wp_remote_get($root_server . "/client_interface/json/?switcher=GetSearchResults&weekdays=" . (date('w')+2) .$services_query. $custom_query .($recursive == "1" ? "&recursive=1" : "")));
                 $serviceBodiesURL_addtl_json = json_decode($serviceBodiesURL_addtl, true);
                 $final_result = array_slice($serviceBodiesURL_addtl_json, 0, $num_results);
             } else if ($results_count >= $num_results && is_array($serviceBodies_results)) {
