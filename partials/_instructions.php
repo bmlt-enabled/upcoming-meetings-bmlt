@@ -89,6 +89,6 @@
     <div>
         <p><strong>custom_query</strong></p>
         <p>You can add a custom query from semantic api to filter results, for ex by format `&formats=54`.</p>
-        <p>Ex. [temporary_closures root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot; custom_query=&quot;&formats=54"]</p>
+        <p>Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot; custom_query=&quot;&formats=54"]</p>
     </div>
 </div>
