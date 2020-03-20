@@ -276,7 +276,7 @@ if (!class_exists("upcomingMeetings")) {
                 $this->options['time_format_dropdown']       = sanitize_text_field($_POST['time_format_dropdown']);
                 $this->options['weekday_language_dropdown']  = sanitize_text_field($_POST['weekday_language_dropdown']);
                 $this->options['custom_query']               = sanitize_text_field($_POST['custom_query']);
-                $this->options['custom_css_um']               = $_POST['custom_css_um'];
+                $this->options['custom_css_um']              = $_POST['custom_css_um'];
 
                 $this->saveAdminOptions();
                 echo '<div class="updated"><p>Success! Your changes were successfully saved!</p></div>';
