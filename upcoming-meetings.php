@@ -4,7 +4,7 @@ Plugin Name: Upcoming Meetings BMLT
 Plugin URI: https://wordpress.org/plugins/upcoming-meetings-bmlt/
 Author: pjaudiomv
 Description: Upcoming Meetings BMLT is a plugin that displays the next 'N' number of meetings from the current time on your page or in a widget using the upcoming_meetings shortcode.
-Version: 1.3.1
+Version: 1.3.2
 Install: Drop this directory into the "wp-content/plugins/" directory and activate it.
 */
 /* Disallow direct access to the plugin file */
@@ -208,7 +208,11 @@ if (!class_exists("upcomingMeetings")) {
                     }
                     $output .= "<div class='upcoming-meetings-location-address'>" . $meeting['location_street'] . "&nbsp;&nbsp;&nbsp;" . $meeting['location_municipality'] . ",&nbsp;" . $meeting['location_province'] . "&nbsp;" . $meeting['location_postal_code_1'] . '</div>';
                     $output .= "<div class='upcoming-meetings-formats-location-info-comments'>" . $meeting['formats'] . "&nbsp;&nbsp;&nbsp;" . $meeting['location_info'] . "&nbsp;" . $meeting['comments'] . '</div>';
-                    $output .= "<div class='upcoming-meetings-map-link'>" . "<a href='https://maps.google.com/maps?q=" . $meeting['latitude'] . "," . $meeting['longitude'] . "' target='new'>Map</a></div>";
+                    if ($meeting['virtual_meeting_link']) {
+                        $output .= "<div class='upcoming-meetings-virtual-link'>" . "<a href='" . $meeting['virtual_meeting_link'] . "' target='new'>" . $meeting['virtual_meeting_link'] . "</a></div>";
+                    } else {
+                        $output .= "<div class='upcoming-meetings-map-link'>" . "<a href='https://maps.google.com/maps?q=" . $meeting['latitude'] . "," . $meeting['longitude'] . "' target='new'>Map</a></div>";
+                    }
                     $output .= "<div class='upcoming-meetings-break'>";
                         $output .= "<hr class='upcoming-meetings-horizontal-rule'>";
                     $output .= "</div>";
@@ -219,6 +223,8 @@ if (!class_exists("upcomingMeetings")) {
 
         /**
          * @desc Adds the options sub-panel
+         * @param $root_server
+         * @return array|int
          */
         public function getAreas($root_server)
         {
@@ -627,6 +633,9 @@ if (!class_exists("upcomingMeetings")) {
                                 $location_nation = htmlspecialchars(trim(stripslashes($meeting['location_nation'])));
                                 $location_postal_code_1 = htmlspecialchars(trim(stripslashes($meeting['location_postal_code_1'])));
                                 $location_municipality = htmlspecialchars(trim(stripslashes($meeting['location_municipality'])));
+                                if ($meeting['location_municipality']) {
+                                    $virtual_link = htmlspecialchars(trim(stripslashes($meeting['virtual_meeting_link'])));
+                                }
                                 $town = '';
 
                                 if ($location_municipality) {
@@ -770,7 +779,13 @@ if (!class_exists("upcomingMeetings")) {
                                     $ret .= $in_block ? '</div>' : '</td>';
 
                                     $ret .= $in_block ? '<div class="bmlt_simple_meeting_one_meeting_address_div">' : '<td class="bmlt_simple_meeting_one_meeting_address_td">';
-                                    $ret .= '<a href="'.$map_uri.'">'.$address.'</a>';
+
+                                    if ($virtual_link) {
+                                        $ret .= '<a href="'.$virtual_link.'">'.$virtual_link.'</a>';
+                                    } else {
+                                        $ret .= '<a href="'.$map_uri.'">'.$address.'</a>';
+                                    }
+
                                     $ret .= $in_block ? '</div>' : '</td>';
 
                                     $ret .= $in_block ? '<div class="bmlt_simple_meeting_one_meeting_format_div">' : '<td class="bmlt_simple_meeting_one_meeting_format_td">';
