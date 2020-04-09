@@ -4,7 +4,7 @@ Plugin Name: Upcoming Meetings BMLT
 Plugin URI: https://wordpress.org/plugins/upcoming-meetings-bmlt/
 Author: pjaudiomv
 Description: Upcoming Meetings BMLT is a plugin that displays the next 'N' number of meetings from the current time on your page or in a widget using the upcoming_meetings shortcode.
-Version: 1.3.2
+Version: 1.3.3
 Install: Drop this directory into the "wp-content/plugins/" directory and activate it.
 */
 /* Disallow direct access to the plugin file */
@@ -200,17 +200,51 @@ if (!class_exists("upcomingMeetings")) {
 
             if ($display_type != 'table' && $display_type != 'block') {
                 foreach ($meeting_results as $meeting) {
+                    if (!in_array("VM", explode(",", $meeting['formats']))
+                        && in_array("TC", explode(",", $meeting['formats']))) {
+                        continue;
+                    }
                     $url = '~(?:(https?)://([^\s<]+)|(www\.[^\s<]+?\.[^\s<]+))(?<![\.,:])~i';
                     $meeting['location_info'] = preg_replace($url, '<a href="$0" target="_blank" title="$0">$0</a>', $meeting['location_info']);
                     $output .= "<div class='upcoming-meetings-time-meeting-name'>" . date($out_time_format, strtotime($meeting['start_time'])) . "&nbsp;&nbsp;&nbsp;" .$days_of_the_week[intval($meeting['weekday_tinyint'])]. "&nbsp;&nbsp;&nbsp;" .$meeting['meeting_name'] . "</div>";
                     if ($location_text) {
                         $output .= "<div class='upcoming-meetings-location-text'>" . $meeting['location_text'] . "</div>";
                     }
-                    $output .= "<div class='upcoming-meetings-location-address'>" . $meeting['location_street'] . "&nbsp;&nbsp;&nbsp;" . $meeting['location_municipality'] . ",&nbsp;" . $meeting['location_province'] . "&nbsp;" . $meeting['location_postal_code_1'] . '</div>';
-                    $output .= "<div class='upcoming-meetings-formats-location-info-comments'>" . $meeting['formats'] . "&nbsp;&nbsp;&nbsp;" . $meeting['location_info'] . "&nbsp;" . $meeting['comments'] . '</div>';
-                    if ($meeting['virtual_meeting_link']) {
-                        $output .= "<div class='upcoming-meetings-virtual-link'>" . "<a href='" . $meeting['virtual_meeting_link'] . "' target='new'>" . $meeting['virtual_meeting_link'] . "</a></div>";
+                    if (in_array("VM", explode(",", $meeting['formats']))
+                        && in_array("TC", explode(",", $meeting['formats']))) {
+                        if ($meeting['virtual_meeting_link'] && $meeting['phone_meeting_number']) {
+                            $output .= '<div class="upcoming-meetings-location-address">' . $meeting['location_street'] . '&nbsp;&nbsp;&nbsp;' . $meeting['location_municipality'] . ',&nbsp;' . $meeting['location_province'] . '&nbsp;' . $meeting['location_postal_code_1'] . '</div>';
+                            $output .= '<div class="upcoming-meetings-formats-location-info-comments">' . $meeting['formats'] . '&nbsp;&nbsp;&nbsp;' . $meeting['location_info'] . '&nbsp;' . $meeting['comments'] . '</div>';
+                            $output .= '<div class="upcoming-meetings-virtual-link">' . '<a href="' .$meeting['virtual_meeting_link']. '" target="new" class="um_virtual_a">' . $meeting['virtual_meeting_link'] . '</a></div>';
+                            $output .= '<div class="upcoming-meetings-phone-link">' . '<a href="tel:' . $meeting['phone_meeting_number']. '"' . 'target="new" class="um_tel_a">' . $meeting['phone_meeting_number'] . '</a></div>';
+                            $output .= '<div class="upcoming-meetings-map-link">' . '<a href="https://maps.google.com/maps?q=' . $meeting['latitude'] . ',' . $meeting['longitude'] . '" target="new" class="um_map_a">Map</a></div>';
+                        } else if ($meeting['phone_meeting_number'] && !$meeting['virtual_meeting_link']) {
+                            $output .= '<div class="upcoming-meetings-location-address">' . $meeting['location_street'] . '&nbsp;&nbsp;&nbsp;' . $meeting['location_municipality'] . ',&nbsp;' . $meeting['location_province'] . '&nbsp;' . $meeting['location_postal_code_1'] . '</div>';
+                            $output .= '<div class="upcoming-meetings-formats-location-info-comments">' . $meeting['formats'] . '&nbsp;&nbsp;&nbsp;' . $meeting['location_info'] . '&nbsp;' . $meeting['comments'] . '</div>';
+                            $output .= '<div class="upcoming-meetings-phone-link">' . '<a href="tel:' . $meeting['phone_meeting_number']. '"' . 'target="new" class="um_tel_a">' . $meeting['phone_meeting_number'] . '</a></div>';
+                            $output .= '<div class="upcoming-meetings-map-link">' . '<a href="https://maps.google.com/maps?q=' . $meeting['latitude'] . ',' . $meeting['longitude'] . '" target="new" class="um_map_a">Map</a></div>';
+                        } else {
+                            $output .= '<div class="upcoming-meetings-location-address">' . $meeting['location_street'] . '&nbsp;&nbsp;&nbsp;' . $meeting['location_municipality'] . ',&nbsp;' . $meeting['location_province'] . '&nbsp;' . $meeting['location_postal_code_1'] . '</div>';
+                            $output .= '<div class="upcoming-meetings-formats-location-info-comments">' . $meeting['formats'] . '&nbsp;&nbsp;&nbsp;' . $meeting['location_info'] . '&nbsp;' . $meeting['comments'] . '</div>';
+                            $output .= '<div class="upcoming-meetings-virtual-link">' . '<a href="' .$meeting['virtual_meeting_link']. '" target="new" class="um_virtual_a">' . $meeting['virtual_meeting_link'] . '</a></div>';
+                            $output .= '<div class="upcoming-meetings-map-link">' . '<a href="https://maps.google.com/maps?q=' . $meeting['latitude'] . ',' . $meeting['longitude'] . '" target="new" class="um_map_a">Map</a></div>';
+                        }
+                    } else if (in_array("VM", explode(",", $meeting['formats']))
+                        && !in_array("TC", explode(",", $meeting['formats']))) {
+                        if ($meeting['virtual_meeting_link'] && $meeting['phone_meeting_number']) {
+                            $output .= '<div class="upcoming-meetings-formats-location-info-comments">' . $meeting['formats'] . '&nbsp;&nbsp;&nbsp;' . '&nbsp;' . $meeting['comments'] . '</div>';
+                            $output .= '<div class="upcoming-meetings-virtual-link">' . '<a href="' .$meeting['virtual_meeting_link']. '" target="new" class="um_virtual_a">' . $meeting['virtual_meeting_link'] . '</a></div>';
+                            $output .= '<div class="upcoming-meetings-phone-link">' . '<a href="tel:' . $meeting['phone_meeting_number']. '"' . 'target="new" class="um_tel_a">' . $meeting['phone_meeting_number'] . '</a></div>';
+                        } else if ($meeting['phone_meeting_number'] && !$meeting['virtual_meeting_link']) {
+                            $output .= '<div class="upcoming-meetings-formats-location-info-comments">' . $meeting['formats'] . '&nbsp;&nbsp;&nbsp;' . '&nbsp;' . $meeting['comments'] . '</div>';
+                            $output .= '<div class="upcoming-meetings-phone-link">' . '<a href="tel:' . $meeting['phone_meeting_number']. '"' . 'target="new" class="um_tel_a">' . $meeting['phone_meeting_number'] . '</a></div>';
+                        } else {
+                            $output .= '<div class="upcoming-meetings-formats-location-info-comments">' . $meeting['formats'] . '&nbsp;&nbsp;&nbsp;' . '&nbsp;' . $meeting['comments'] . '</div>';
+                            $output .= '<div class="upcoming-meetings-virtual-link">' . '<a href="' .$meeting['virtual_meeting_link']. '" target="new" class="um_virtual_a">' . $meeting['virtual_meeting_link'] . '</a></div>';
+                        }
                     } else {
+                        $output .= "<div class='upcoming-meetings-location-address'>" . $meeting['location_street'] . "&nbsp;&nbsp;&nbsp;" . $meeting['location_municipality'] . ",&nbsp;" . $meeting['location_province'] . "&nbsp;" . $meeting['location_postal_code_1'] . '</div>';
+                        $output .= "<div class='upcoming-meetings-formats-location-info-comments'>" . $meeting['formats'] . "&nbsp;&nbsp;&nbsp;" . $meeting['location_info'] . "&nbsp;" . $meeting['comments'] . '</div>';
                         $output .= "<div class='upcoming-meetings-map-link'>" . "<a href='https://maps.google.com/maps?q=" . $meeting['latitude'] . "," . $meeting['longitude'] . "' target='new'>Map</a></div>";
                     }
                     $output .= "<div class='upcoming-meetings-break'>";
@@ -633,8 +667,19 @@ if (!class_exists("upcomingMeetings")) {
                                 $location_nation = htmlspecialchars(trim(stripslashes($meeting['location_nation'])));
                                 $location_postal_code_1 = htmlspecialchars(trim(stripslashes($meeting['location_postal_code_1'])));
                                 $location_municipality = htmlspecialchars(trim(stripslashes($meeting['location_municipality'])));
-                                if ($meeting['location_municipality']) {
+                                if (!in_array("VM", explode(",", $meeting['formats']))
+                                    && in_array("TC", explode(",", $meeting['formats']))) {
+                                    continue;
+                                }
+                                if ($meeting['virtual_meeting_link']) {
                                     $virtual_link = htmlspecialchars(trim(stripslashes($meeting['virtual_meeting_link'])));
+                                } else {
+                                    $virtual_link = '';
+                                }
+                                if ($meeting['phone_meeting_number']) {
+                                    $phone_number = htmlspecialchars(trim(stripslashes($meeting['phone_meeting_number'])));
+                                } else {
+                                    $phone_number = '';
                                 }
                                 $town = '';
 
@@ -732,7 +777,6 @@ if (!class_exists("upcomingMeetings")) {
                                     if (7 < $meeting_weekday) {
                                         $meeting_weekday = 1;
                                     }
-
                                     if (($current_weekday != $meeting_weekday) && $in_block) {
                                         if ($current_weekday != -1) {
                                             $weekday_div = false;
@@ -780,10 +824,31 @@ if (!class_exists("upcomingMeetings")) {
 
                                     $ret .= $in_block ? '<div class="bmlt_simple_meeting_one_meeting_address_div">' : '<td class="bmlt_simple_meeting_one_meeting_address_td">';
 
-                                    if ($virtual_link) {
-                                        $ret .= '<a href="'.$virtual_link.'">'.$virtual_link.'</a>';
+                                    if (in_array("VM", explode(",", $meeting['formats']))
+                                        && in_array("TC", explode(",", $meeting['formats']))) {
+                                        if ($virtual_link && $phone_number) {
+                                            $ret .= '<a href="'.$virtual_link.'" class="um_virtual_a">'.$virtual_link.'</a><br/>';
+                                            $ret .= '<a href="tel:'.$phone_number.'" class="um_tel_a">'.$phone_number.'</a><br/>';
+                                            $ret .= '<a href="'.$map_uri.'" class="um_map_a">'.$address.'</a>';
+                                        } else if ($phone_number && !$virtual_link) {
+                                            $ret .= '<a href="tel:'.$phone_number.'" class="um_tel_a">'.$phone_number.'</a><br/>';
+                                            $ret .= '<a href="'.$map_uri.'" class="um_map_a">'.$address.'</a>';
+                                        } else {
+                                            $ret .= '<a href="'.$virtual_link.'" class="um_virtual_a">'.$virtual_link.'</a><br/>';
+                                            $ret .= '<a href="'.$map_uri.'" class="um_map_a">'.$address.'</a>';
+                                        }
+                                    } else if (in_array("VM", explode(",", $meeting['formats']))
+                                        && !in_array("TC", explode(",", $meeting['formats']))) {
+                                        if ($virtual_link && $phone_number) {
+                                            $ret .= '<a href="'.$virtual_link.'" class="um_virtual_a">'.$virtual_link.'</a><br/>';
+                                            $ret .= '<a href="tel:'.$phone_number.'" class="um_tel_a">'.$phone_number.'</a>';
+                                        } else if ($phone_number && !$virtual_link) {
+                                            $ret .= '<a href="tel:'.$phone_number.'" class="um_tel_a">'.$phone_number.'</a>';
+                                        } else {
+                                            $ret .= '<a href="'.$virtual_link.'" class="um_virtual_a">'.$virtual_link.'</a>';
+                                        }
                                     } else {
-                                        $ret .= '<a href="'.$map_uri.'">'.$address.'</a>';
+                                        $ret .= '<a href="'.$map_uri.'" class="um_map_a">'.$address.'</a>';
                                     }
 
                                     $ret .= $in_block ? '</div>' : '</td>';

@@ -1,7 +1,0 @@
-[Thu Apr 09 18:03:53.238660 2020] [ssl:warn] [pid 1] AH01909: 172.21.0.2:443:0 server certificate does NOT include an ID which matches the server name
-AH00558: apache2: Could not reliably determine the server's fully qualified domain name, using 172.21.0.2. Set the 'ServerName' directive globally to suppress this message
-[Thu Apr 09 18:03:53.295272 2020] [ssl:warn] [pid 1] AH01909: 172.21.0.2:443:0 server certificate does NOT include an ID which matches the server name
-[Thu Apr 09 18:03:53.299323 2020] [mpm_prefork:notice] [pid 1] AH00163: Apache/2.4.38 (Debian) PHP/7.2.29 OpenSSL/1.1.1d configured -- resuming normal operations
-[Thu Apr 09 18:03:53.299808 2020] [core:notice] [pid 1] AH00094: Command line: 'apache2 -D FOREGROUND'
-sh: 1: -t: not found
-[Thu Apr 09 18:09:46.402425 2020] [mpm_prefork:notice] [pid 1] AH00170: caught SIGWINCH, shutting down gracefully
