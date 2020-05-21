@@ -5,7 +5,7 @@ Plugin URI: https://wordpress.org/plugins/upcoming-meetings-bmlt/
 Tags: bmlt, basic meeting list toolbox, Upcoming Meetings, Upcoming Meetings BMLT, narcotics anonymous, na
 Requires at least: 4.0
 Requires PHP: 5.6
-Tested up to: 5.4.0
+Tested up to: 5.4.1
 Stable tag: 1.3.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -58,16 +58,12 @@ Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot
 
 == EXAMPLES ==
 
-<a href="https://sca.charlestonna.org/upcoming-meetings/">https://sca.charlestonna.org/upcoming-meetings/</a>
-
-<a href="https://sca.charlestonna.org/upcoming-meetings-table/">https://sca.charlestonna.org/upcoming-meetings-table/</a>
-
-<a href="https://sca.charlestonna.org/upcoming-meetings-block/">https://sca.charlestonna.org/upcoming-meetings-block/</a>
+<a href="https://www.southcoastalna.org/">https://www.southcoastalna.org/</a>
 
 
 == MORE INFORMATION ==
 
-<a href="https://github.com/pjaudiomv/upcoming-meetings-bmlt" target="_blank">https://github.com/pjaudiomv/upcoming-meetings-bmlt</a>
+<a href="https://github.com/bmlt-enabled/upcoming-meetings-bmlt" target="_blank">https://github.com/bmlt-enabled/upcoming-meetings-bmlt</a>
 
 
 == Installation ==
