@@ -4,7 +4,7 @@ Plugin Name: Upcoming Meetings BMLT
 Plugin URI: https://wordpress.org/plugins/upcoming-meetings-bmlt/
 Author: pjaudiomv
 Description: Upcoming Meetings BMLT is a plugin that displays the next 'N' number of meetings from the current time on your page or in a widget using the upcoming_meetings shortcode.
-Version: 1.3.4
+Version: 1.3.5
 Install: Drop this directory into the "wp-content/plugins/" directory and activate it.
 */
 /* Disallow direct access to the plugin file */
@@ -699,6 +699,11 @@ if (!class_exists("upcomingMeetings")) {
                                 } else {
                                     $phone_number = '';
                                 }
+                                if ($meeting['virtual_meeting_additional_info']) {
+                                    $virtual_additional_info = htmlspecialchars(trim(stripslashes($meeting['virtual_meeting_additional_info'])));
+                                } else {
+                                    $virtual_additional_info = '';
+                                }
                                 $town = '';
 
                                 if ($location_municipality) {
@@ -845,24 +850,42 @@ if (!class_exists("upcomingMeetings")) {
                                     if (in_array("VM", explode(",", $meeting['formats']))
                                         && in_array("TC", explode(",", $meeting['formats']))) {
                                         if ($virtual_link && $phone_number) {
+                                            if ($virtual_additional_info != '') {
+                                                $ret .= $virtual_additional_info . '<br/>';
+                                            }
                                             $ret .= '<a href="'.$virtual_link.'" class="um_virtual_a">'.$virtual_link.'</a><br/>';
                                             $ret .= '<a href="tel:'.$phone_number.'" class="um_tel_a">'.$phone_number.'</a><br/>';
                                             $ret .= '<a href="'.$map_uri.'" class="um_map_a">'.$address.'</a>';
                                         } else if ($phone_number && !$virtual_link) {
+                                            if ($virtual_additional_info != '') {
+                                                $ret .= $virtual_additional_info . '<br/>';
+                                            }
                                             $ret .= '<a href="tel:'.$phone_number.'" class="um_tel_a">'.$phone_number.'</a><br/>';
                                             $ret .= '<a href="'.$map_uri.'" class="um_map_a">'.$address.'</a>';
                                         } else {
+                                            if ($virtual_additional_info != '') {
+                                                $ret .= $virtual_additional_info . '<br/>';
+                                            }
                                             $ret .= '<a href="'.$virtual_link.'" class="um_virtual_a">'.$virtual_link.'</a><br/>';
                                             $ret .= '<a href="'.$map_uri.'" class="um_map_a">'.$address.'</a>';
                                         }
                                     } else if (in_array("VM", explode(",", $meeting['formats']))
                                         && !in_array("TC", explode(",", $meeting['formats']))) {
                                         if ($virtual_link && $phone_number) {
+                                            if ($virtual_additional_info != '') {
+                                                $ret .= $virtual_additional_info . '<br/>';
+                                            }
                                             $ret .= '<a href="'.$virtual_link.'" class="um_virtual_a">'.$virtual_link.'</a><br/>';
                                             $ret .= '<a href="tel:'.$phone_number.'" class="um_tel_a">'.$phone_number.'</a>';
                                         } else if ($phone_number && !$virtual_link) {
+                                            if ($virtual_additional_info != '') {
+                                                $ret .= $virtual_additional_info . '<br/>';
+                                            }
                                             $ret .= '<a href="tel:'.$phone_number.'" class="um_tel_a">'.$phone_number.'</a>';
                                         } else {
+                                            if ($virtual_additional_info != '') {
+                                                $ret .= $virtual_additional_info . '<br/>';
+                                            }
                                             $ret .= '<a href="'.$virtual_link.'" class="um_virtual_a">'.$virtual_link.'</a>';
                                         }
                                     } else {
