@@ -35,9 +35,9 @@ jobs:
     - chmod +x deploy-wordpress.sh
     deploy:
     - provider: s3
-      access_key_id: AKIAI7JHYFA6DI3WYP5A
+      access_key_id: AKIA3EWZC3OHKYCL5SIY
       secret_access_key:
-        secure: pdofPn+jOokXRva+z9xzvly2fROItTDl15gsBSXbNTHmL7TfKEBQ0r5MuiTKJT9vSwIQxZ0Y+97doSKZUoznHByO6bsyrqpk7DPUzXSkV6/7zmDjkxSRPbkwId3Hnb4MFZhPgX3gMLdV3RKIbLEqbfEdp+nxr+oos2b+EwAYsqnAe9t2wBFeYKrFk9EV1Kgb7g90RRhg10uehOfrOucXGVznMGUucUpYZbC3Iu2LTT1XhRcNr2UYcrRNGlmXNFB3usiMPGOKpreriMuoLF35jvPPgGjiLbVqX+RXUazM+yqYziLppoeysgoRFB6VHCU4EgM4by9xY8dEaoNoTScjBcNq6wPYovj4RELbD3DfMk4+8eu8mTpru1NPUfH7HJ8zFAMSLpAV4UmnEAqXDu2M04L+tLktwfEr/q9CWWnKGmbExqdnxarVlS8qsTIXh3rxReQ97jAHuQOKOer8hmO8rwH5eDqp1bSQA/iEWAPZNPhfo0bZWZlQi1yWo1NCyNX+a1mDKN/BXD0i69BTIF/WgZtvVF2OsO+vcdXZV09N2nLQoPmrbGFhN0RvcmVbSWiHLxwCkSYFq+MdbRdEkyIhjU4XM+u0PDsstCA083FN203WP1AFBDKCOCmlJeh3eLhffsJm69mAnF9y43X26czS/3/d6hTz47dcDyvL5MSadmo=
+        secure: FwdYUTX6LpE7bJTwZswf93rmqjHSWIGYRCS0TNh0mHiCP91LaJwOn6UbAfkFzjYbNLeOGGtn/vs6RevJ2Iu4XUykdXaxxQCvh47HhAkdezxHZF4Ro1NL779ISnR/mC04keIqdDGNZ8402QV175ZKHckRCllzq/VO1GH0eR0wMXL/g8LPH5HOPmFxlEkVUQmRW2LBdgmfXUkDydJhaYkVVBOhb2tRdsTRm1yxC4iygB425+HUyLB75HY1ZHO9Mb1c+KwSi7GpiTZW+5xciKlypg6A3Yo5IsovruYaBA0fKgCxz2rULKEwtt6Pzk4INtX7PiFsY9OmCykEPzaLkzmbdECuK48jiC7Butd6wKNHUvqeqWG44oNeFwzL/+UB0cdBq+mZlYmDyse3nafo0LmDVYvrRR7xxyRmvT/4j1mSgYAyxbk6qRigdhWIhP5Dp8Ix7D3bDX/BX1LgbFRvtP9oLRAlyAqCQyjm8zeqGyt4wtiws/VX93UUuzYyycJE3NutjIbvDwaJkAxoY+xhuwoUU3aKHQxUdW+K0x5EVqibUuaoRr7JSYmbe1jNmMpRMwBdmUSWR8WZw5QZiWNQqiIXYGep0IWum/lVOluTGwVXObnmYLRmWk1+4S755EqLcql+7R5Yl1OJwY7awiJAN5fNf/dEPc0DHVtXiHPF/+bRr1c=
       bucket: "$S3_BUCKET"
       local_dir: "$DIST_DIR_S3"
       upload-dir: "$S3_KEY"
