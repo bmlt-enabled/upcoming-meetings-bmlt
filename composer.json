@@ -1,6 +1,14 @@
 {
+  "name": "bmlt/upcoming-meetings-bmlt",
+  "description": "This is a WordPress plugin for BMLT.",
+  "type": "project",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "pjaudiomv"
+    }
+  ],
   "require-dev": {
     "squizlabs/php_codesniffer": "3.*"
   }
 }
-
