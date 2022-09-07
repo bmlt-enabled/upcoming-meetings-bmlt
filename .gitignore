@@ -2,4 +2,4 @@
 vendor
 .idea
 logs
-/.github export-ignore
+/.github
