@@ -4,7 +4,7 @@ Plugin Name: Upcoming Meetings BMLT
 Plugin URI: https://wordpress.org/plugins/upcoming-meetings-bmlt/
 Author: pjaudiomv
 Description: Upcoming Meetings BMLT is a plugin that displays the next 'N' number of meetings from the current time on your page or in a widget using the upcoming_meetings shortcode.
-Version: 1.3.7
+Version: 1.4.0
 Install: Drop this directory into the "wp-content/plugins/" directory and activate it.
 */
 /* Disallow direct access to the plugin file */
@@ -111,18 +111,15 @@ if (!class_exists("upcomingMeetings")) {
                     'User-Agent' => 'Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 5.0) +UpcomingMeetingsBMLT'
                 )
             );
-            $results = wp_remote_get("$root_server/client_interface/serverInfo.xml", $args);
+            $results = wp_remote_get("$root_server/client_interface/json/?switcher=GetServerInfo", $args);
             $httpcode = wp_remote_retrieve_response_code($results);
             $response_message = wp_remote_retrieve_response_message($results);
             if ($httpcode != 200 && $httpcode != 302 && $httpcode != 304 && ! empty($response_message)) {
                 //echo '<p>Problem Connecting to BMLT Root Server: ' . $root_server . '</p>';
                 return false;
             };
-            $results = simplexml_load_string(wp_remote_retrieve_body($results));
-            $results = json_encode($results);
-            $results = json_decode($results, true);
-            $results = $results['serverVersion']['readableString'];
-            return $results;
+            $results = json_decode(wp_remote_retrieve_body($results), true);
+            return $results[0]["version"];
         }
 
         public function upcomingMeetingsMain($atts, $content = null)
