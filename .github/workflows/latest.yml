@@ -5,7 +5,7 @@ on:
     branches: [ 'master' ]
 
 jobs:
-  deploy-wordpress-satellite-latest:
+  deploy-upcoming-meetings-latest:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
