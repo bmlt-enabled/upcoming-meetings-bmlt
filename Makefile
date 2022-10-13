@@ -16,7 +16,7 @@ clean:  ## clean
 	rm -rf build dist
 
 $(VENDOR_AUTOLOAD):
-	composer install --prefer-dist --no-progress --no-suggest
+	composer install --prefer-dist --no-progress
 
 .PHONY: composer
 composer: $(VENDOR_AUTOLOAD) ## Runs composer install
