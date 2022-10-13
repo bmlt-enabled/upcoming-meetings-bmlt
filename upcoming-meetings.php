@@ -23,7 +23,7 @@ if (!class_exists("upcomingMeetings")) {
         public $options = array();
         const HTTP_RETRIEVE_ARGS = array(
             'headers' => array(
-                'User-Agent' => 'Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 5.0) +UpcomingMeetingsBMLT'
+                'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:105.0) Gecko/20100101 Firefox/105.0 +UpcomingMeetingsBMLT'
             ),
             'timeout' => 60
         );
@@ -105,13 +105,7 @@ if (!class_exists("upcomingMeetings")) {
 
         public function testRootServer($root_server)
         {
-            $args = array(
-                'timeout' => '10',
-                'headers' => array(
-                    'User-Agent' => 'Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 5.0) +UpcomingMeetingsBMLT'
-                )
-            );
-            $results = wp_remote_get("$root_server/client_interface/json/?switcher=GetServerInfo", $args);
+            $results = wp_remote_get("$root_server/client_interface/json/?switcher=GetServerInfo", upcomingMeetings::HTTP_RETRIEVE_ARGS);
             $httpcode = wp_remote_retrieve_response_code($results);
             $response_message = wp_remote_retrieve_response_message($results);
             if ($httpcode != 200 && $httpcode != 302 && $httpcode != 304 && ! empty($response_message)) {
