@@ -15,10 +15,6 @@ jobs:
         id: composer-validate
         run: composer validate
 
-      - name: Install dependencies
-        id: install-dependencies
-        run: make composer
-
       - name: PHPCS checker
         id: php-codesniffer
         run: make lint
