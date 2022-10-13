@@ -4,7 +4,7 @@ Plugin Name: Upcoming Meetings BMLT
 Plugin URI: https://wordpress.org/plugins/upcoming-meetings-bmlt/
 Author: pjaudiomv
 Description: Upcoming Meetings BMLT is a plugin that displays the next 'N' number of meetings from the current time on your page or in a widget using the upcoming_meetings shortcode.
-Version: 1.4.1
+Version: 1.4.2
 Install: Drop this directory into the "wp-content/plugins/" directory and activate it.
 */
 /* Disallow direct access to the plugin file */
@@ -113,7 +113,12 @@ if (!class_exists("upcomingMeetings")) {
                 return false;
             };
             $results = json_decode(wp_remote_retrieve_body($results), true);
-            return $results[0]["version"];
+            return is_array($results) && array_key_exists("version", $results[0]) ? $results[0]["version"] : '';
+        }
+
+        public function arraySafeGet($arr, $i = 0)
+        {
+            return is_array($arr) ? $arr[$i] ?? '': '';
         }
 
         public function upcomingMeetingsMain($atts, $content = null)
@@ -136,14 +141,14 @@ if (!class_exists("upcomingMeetings")) {
             );
 
             $area_data_dropdown   = explode(',', $this->options['service_body_dropdown']);
-            $services_dropdown    = $area_data_dropdown[1];
+            $services_dropdown    = $this->arraySafeGet($area_data_dropdown, 1);
 
             $root_server          = ($args['root_server']       != '' ? $args['root_server']       : $this->options['root_server']);
             $services             = ($args['services']          != '' ? $args['services']          : $services_dropdown);
             $recursive            = ($args['recursive']         != '' ? $args['recursive']         : $this->options['recursive']);
             $grace_period         = ($args['grace_period']      != '' ? $args['grace_period']      : $this->options['grace_period_dropdown']);
             $num_results          = ($args['num_results']       != '' ? $args['num_results']       : $this->options['num_results_dropdown']);
-            $timezone             = ($args['timezone']          != '' ? $args['timezone']          : $this->options['timezones_dropdown']);
+            $timezone             = ($args['timezone']          != '' ? $args['timezone']          ?? $this->options['timezones_dropdown'] : 'America/New_York');
             $display_type         = ($args['display_type']      != '' ? $args['display_type']      : $this->options['display_type_dropdown']);
             $location_text        = ($args['location_text']     != '' ? $args['location_text']     : $this->options['location_text']);
             $time_format          = ($args['time_format']       != '' ? $args['time_format']       : $this->options['time_format_dropdown']);
@@ -410,13 +415,13 @@ if (!class_exists("upcomingMeetings")) {
                                         <?php asort($unique_areas); ?>
                                         <?php foreach ($unique_areas as $key => $unique_area) { ?>
                                             <?php $area_data          = explode(',', $unique_area); ?>
-                                            <?php $area_name          = $area_data[0]; ?>
-                                            <?php $area_id            = $area_data[1]; ?>
-                                            <?php $area_parent        = $area_data[2]; ?>
-                                            <?php $area_parent_name   = $area_data[3]; ?>
+                                            <?php $area_name          = $this->arraySafeGet($area_data); ?>
+                                            <?php $area_id            = $this->arraySafeGet($area_data, 1); ?>
+                                            <?php $area_parent        = $this->arraySafeGet($area_data, 2); ?>
+                                            <?php $area_parent_name   = $this->arraySafeGet($area_data, 3); ?>
                                             <?php $option_description = $area_name . " (" . $area_id . ") " . $area_parent_name . " (" . $area_parent . ")" ?>
                                             <?php $is_data = explode(',', esc_html($this->options['service_body_dropdown'])); ?>
-                                            <?php if ($area_id == $is_data[1]) { ?>
+                                            <?php if ($area_id == $this->arraySafeGet($is_data, 1)) { ?>
                                                 <option selected="selected" value="<?php echo $unique_area; ?>"><?php echo $option_description; ?></option>
                                             <?php } else { ?>
                                                 <option value="<?php echo $unique_area; ?>"><?php echo $option_description; ?></option>
