@@ -366,17 +366,17 @@ if (!class_exists("upcomingMeetings")) {
                 if (!wp_verify_nonce($_POST['_wpnonce'], 'upcomingmeetingsupdate-options')) {
                     die('Whoops! There was a problem with the data you posted. Please go back and try again.');
                 }
-                $this->options['root_server']                = esc_url_raw($_POST['root_server']);
-                $this->options['service_body_dropdown']      = sanitize_text_field($_POST['service_body_dropdown']);
-                $this->options['recursive']                  = sanitize_text_field($_POST['recursive']);
-                $this->options['grace_period_dropdown']      = sanitize_text_field($_POST['grace_period_dropdown']);
-                $this->options['num_results_dropdown']       = sanitize_text_field($_POST['num_results_dropdown']);
-                $this->options['timezones_dropdown']         = sanitize_text_field($_POST['timezones_dropdown']);
-                $this->options['display_type_dropdown']      = sanitize_text_field($_POST['display_type_dropdown']);
-                $this->options['location_text']              = sanitize_text_field($_POST['location_text']);
-                $this->options['time_format_dropdown']       = sanitize_text_field($_POST['time_format_dropdown']);
-                $this->options['weekday_language_dropdown']  = sanitize_text_field($_POST['weekday_language_dropdown']);
-                $this->options['custom_query']               = sanitize_text_field($_POST['custom_query']);
+                $this->options['root_server']                = esc_url_raw($_POST['root_server']) ?? '';
+                $this->options['service_body_dropdown']      = sanitize_text_field($_POST['service_body_dropdown']) ?? '';
+                $this->options['recursive']                  = sanitize_text_field($_POST['recursive']) ?? '0';
+                $this->options['grace_period_dropdown']      = sanitize_text_field($_POST['grace_period_dropdown']) ?? '15';
+                $this->options['num_results_dropdown']       = sanitize_text_field($_POST['num_results_dropdown']) ?? '5';
+                $this->options['timezones_dropdown']         = sanitize_text_field($_POST['timezones_dropdown']) ?? 'America/New_York';
+                $this->options['display_type_dropdown']      = sanitize_text_field($_POST['display_type_dropdown']) ?? 'simple';
+                $this->options['location_text']              = sanitize_text_field($_POST['location_text']) ?? '0';
+                $this->options['time_format_dropdown']       = sanitize_text_field($_POST['time_format_dropdown']) ?? '12';
+                $this->options['weekday_language_dropdown']  = sanitize_text_field($_POST['weekday_language_dropdown']) ?? 'en';
+                $this->options['custom_query']               = sanitize_text_field($_POST['custom_query']) ?? '';
                 $this->options['custom_css_um']              = $_POST['custom_css_um'];
 
                 $this->saveAdminOptions();

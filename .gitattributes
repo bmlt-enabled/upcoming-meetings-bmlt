@@ -10,3 +10,5 @@ Makefile export-ignore
 /docs export-ignore
 /.github export-ignore
 .phpcs.xml export-ignore
+phpunit.xml export-ignore
+/tests export-ignore
