@@ -31,3 +31,7 @@ lint: $(VENDOR_AUTOLOAD) ## PHP Lint
 .PHONY: lint-fix
 lint-fix: $(VENDOR_AUTOLOAD) ## PHP Lint Fix
 	vendor/squizlabs/php_codesniffer/bin/phpcbf
+
+.PHONY: test
+test: $(VENDOR_AUTOLOAD) ## PHP Unit Tests
+	vendor/phpunit/phpunit/phpunit
