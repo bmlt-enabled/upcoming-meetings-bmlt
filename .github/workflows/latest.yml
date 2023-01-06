@@ -10,15 +10,15 @@ jobs:
     env:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     steps:
-      - name: Check out code
-        uses: actions/checkout@v2
+      - name: Check out code 🛒
+        uses: actions/checkout@v3
 
-      - name: Setup PHP
+      - name: Setup PHP 🐫
         uses: shivammathur/setup-php@v2
         with:
           php-version: 7.4
 
-      - name: PHPCS checker
+      - name: PHPCS checker 🧹
         id: php-codesniffer
         run: make lint
 
@@ -43,10 +43,11 @@ jobs:
       PLUGIN: "upcoming-meetings-bmlt"
     needs: [ lint ]
     steps:
-      - uses: actions/checkout@v3
+      - name: Check out code 🛒
+        uses: actions/checkout@v3
         id: code-checkout
 
-      - name: Prepare to deploy
+      - name: Prepare to deploy 🔧
         run: |
           export FILENAME=${PLUGIN}-build-${GITHUB_RUN_NUMBER}-${GITHUB_SHA}
           export ZIP_FILENAME=$FILENAME.zip
@@ -54,18 +55,18 @@ jobs:
           make build
           mkdir -p ${DIST_DIR_S3} && cp ${BUILD_DIR}/${ZIP_FILENAME} ${DIST_DIR_S3}/${ZIP_FILENAME}
 
-      - name: configure aws credentials
+      - name: configure aws credentials 🪪
         uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions/gh-ci-s3-artifact
           role-session-name: gh-actions-${{ env.PLUGIN }}
           aws-region: us-east-1
 
-      - name: copy artifact to s3
+      - name: copy artifact to s3 🪣
         run: |
           aws s3 cp $DIST_DIR_S3/$ZIP_FILENAME s3://$S3_BUCKET/$S3_KEY/$ZIP_FILENAME
 
-      - name: Publish Release to Latest WP
+      - name: Publish Release to Latest WP 🎉
         id: publish_latest
         uses: bmlt-enabled/wordpress-releases-github-action@v1
         with:
