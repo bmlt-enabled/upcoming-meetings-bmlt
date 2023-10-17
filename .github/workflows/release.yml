@@ -11,7 +11,7 @@ jobs:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     steps:
       - name: Check out code 🛒
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup PHP 🐫
         uses: shivammathur/setup-php@v2
@@ -22,7 +22,7 @@ jobs:
         id: php-codesniffer
         run: make lint
 
-      - uses: act10ns/slack@v1
+      - uses: act10ns/slack@v2
         with:
           status: ${{ job.status }}
           steps: ${{ toJson(steps) }}
@@ -38,9 +38,11 @@ jobs:
       PLUGIN: "upcoming-meetings-bmlt"
       MAINFILE: "upcoming-meetings.php"
     needs: [ lint ]
+    permissions:
+      contents: write
     steps:
       - name: Check out code 🛒
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Build package 🔧
         id: build-package
@@ -65,7 +67,7 @@ jobs:
           echo "RELEASE_TYPE=${RELEASE_TYPE}" >> $GITHUB_ENV
 
       - name: Create Release 🎉
-        uses: ncipollo/release-action@v1.11.1
+        uses: ncipollo/release-action@v1.13.0
         if: github.ref_type == 'tag'
         with:
           artifacts: ${{ env.ARTIFACT_PATH }}
