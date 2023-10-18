@@ -8,4 +8,4 @@ logs/
 build/
 docs/
 *.zip
-.phpdoc
+.phpdoc/

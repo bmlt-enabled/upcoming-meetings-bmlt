@@ -340,7 +340,7 @@ class Settings
     {
         // If your plugin is under a different top-level menu than Settings (IE - you changed the function above to something other than add_options_page)
         // Then you're going to want to change options-general.php below to the name of your top-level page
-        $settings_link = '<a href="options-general.php?page=upcomming-meetings-bmlt">Settings</a>';
+        $settings_link = '<a href="options-general.php?page=upcoming-meetings-bmlt">Settings</a>';
         array_unshift($links, $settings_link);
         // before other links
         return $links;
