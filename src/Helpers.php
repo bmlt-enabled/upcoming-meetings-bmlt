@@ -42,39 +42,62 @@ class Helpers
      */
     const NOON = '12:00:00';
 
+    /**
+     * Translation data for multiple languages.
+     *
+     * This associative array contains translations for various languages, with each language
+     * represented by its ISO language code. Each language array contains translations for various keys.
+     *
+     * Example Usage:
+     * - To access the translation for 'Online Meeting Link' in English: TRANSLATIONS['en']['meeting_link']
+     * - To access the translation for 'Map' in French: TRANSLATIONS['fr']['map']
+     *
+     * @var array $TRANSLATIONS
+     */
     const TRANSLATIONS = [
         'da' => [
-            'meeting_link' => 'Online Mødelink'
+            'meeting_link' => 'Online Mødelink',
+            'map' => 'Kort'
         ],
         'de' => [
-            'meeting_link' => 'Link zum Online-Meeting'
+            'meeting_link' => 'Link zum Online-Meeting',
+            'map' => 'Karte'
         ],
         'en' => [
-            'meeting_link' => 'Online Meeting Link'
+            'meeting_link' => 'Online Meeting Link',
+            'map' => 'Map'
         ],
         'es' => [
-            'meeting_link' => 'Enlace de Reunión en Línea'
+            'meeting_link' => 'Enlace de Reunión en Línea',
+            'map' => 'Mapa'
         ],
         'fa' => [
-            'meeting_link' => 'لینک جلسه آنلاین'
+            'meeting_link' => 'لینک جلسه آنلاین',
+            'map' => 'نقشه'
         ],
         'fr' => [
-            'meeting_link' => 'Lien de Réunion en Ligne'
+            'meeting_link' => 'Lien de Réunion en Ligne',
+            'map' => 'Carte'
         ],
         'it' => [
-            'meeting_link' => 'Link per Riunione Online'
+            'meeting_link' => 'Link per Riunione Online',
+            'map' => 'Mappa'
         ],
         'pl' => [
-            'meeting_link' => 'Link do Spotkania Online'
+            'meeting_link' => 'Link do Spotkania Online',
+            'map' => 'Mapa'
         ],
         'pt' => [
-            'meeting_link' => 'Link de Reunião Online'
+            'meeting_link' => 'Link de Reunião Online',
+            'map' => 'Mapa'
         ],
         'ru' => [
-            'meeting_link' => 'Ссылка на Онлайн-собрание'
+            'meeting_link' => 'Ссылка на Онлайн-собрание',
+            'map' => 'Карта'
         ],
         'sv' => [
-            'meeting_link' => 'Länk till Online-möte'
+            'meeting_link' => 'Länk till Online-möte',
+            'map' => 'Karta'
         ]
     ];
 
@@ -572,7 +595,7 @@ class Helpers
             } else {
                 $content .= "<div class='upcoming-meetings-location-address'>" . $meeting['location_street'] . "&nbsp;&nbsp;&nbsp;" . $meeting['location_municipality'] . ",&nbsp;" . $meeting['location_province'] . "&nbsp;" . $meeting['location_postal_code_1'] . '</div>';
                 $content .= "<div class='upcoming-meetings-formats-location-info-comments'>" . $meeting['formats'] . "&nbsp;&nbsp;&nbsp;" . $meeting['location_info'] . "&nbsp;" . $meeting['comments'] . '</div>';
-                $content .= "<div class='upcoming-meetings-map-link'><a href='https://maps.google.com/maps?q=" . $meeting['latitude'] . "," . $meeting['longitude'] . "' target='new'>Map</a></div>";
+                $content .= "<div class='upcoming-meetings-map-link'><a href='https://maps.google.com/maps?q=" . $meeting['latitude'] . "," . $meeting['longitude'] . "' target='new'>" . $this->translateText('map', $weekdayLanguage) . "</a></div>";
             }
 
             // Virtual Meeting
