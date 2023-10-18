@@ -86,7 +86,7 @@ class Settings
         $this->options['time_format_dropdown']       = isset($_POST['time_format_dropdown']) ? sanitize_text_field($_POST['time_format_dropdown']) : '';
         $this->options['weekday_language_dropdown']  = isset($_POST['weekday_language_dropdown']) ? sanitize_text_field($_POST['weekday_language_dropdown']) : '';
         $this->options['custom_query']               = isset($_POST['custom_query']) ? sanitize_text_field($_POST['custom_query']) : '';
-        $this->options['custom_css_um']              = $_POST['custom_css_um'];
+        $this->options['custom_css_um']              = isset($_POST['custom_query']) ? $_POST['custom_css_um'] : '';
         $this->saveAdminOptions();
     }
 

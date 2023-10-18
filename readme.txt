@@ -4,7 +4,7 @@ Contributors: pjaudiomv, bmltenabled
 Plugin URI: https://wordpress.org/plugins/upcoming-meetings-bmlt/
 Tags: bmlt, basic meeting list toolbox, Upcoming Meetings, Upcoming Meetings BMLT, narcotics anonymous, na
 Requires at least: 4.0
-Requires PHP: 7.0
+Requires PHP: 8.0
 Tested up to: 6.3.2
 Stable tag: 1.5.0
 License: GPLv2 or later
@@ -89,6 +89,7 @@ This section describes how to install the plugin and get it working.
 
 = 1.5.0 =
 
+* Note this version requires BMLT Root Server version 3.04 or greater.
 * Now shows virtual meeting info in table/block html display types.
 * Added option to show header info for Table/Block display.
 * Added support for all standard BMLT languages.
