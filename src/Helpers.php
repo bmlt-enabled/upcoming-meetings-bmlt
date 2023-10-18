@@ -42,6 +42,42 @@ class Helpers
      */
     const NOON = '12:00:00';
 
+    const TRANSLATIONS = [
+        'da' => [
+            'meeting_link' => 'Online Mødelink'
+        ],
+        'de' => [
+            'meeting_link' => 'Link zum Online-Meeting'
+        ],
+        'en' => [
+            'meeting_link' => 'Online Meeting Link'
+        ],
+        'es' => [
+            'meeting_link' => 'Enlace de Reunión en Línea'
+        ],
+        'fa' => [
+            'meeting_link' => 'لینک جلسه آنلاین'
+        ],
+        'fr' => [
+            'meeting_link' => 'Lien de Réunion en Ligne'
+        ],
+        'it' => [
+            'meeting_link' => 'Link per Riunione Online'
+        ],
+        'pl' => [
+            'meeting_link' => 'Link do Spotkania Online'
+        ],
+        'pt' => [
+            'meeting_link' => 'Link de Reunião Online'
+        ],
+        'ru' => [
+            'meeting_link' => 'Ссылка на Онлайн-собрание'
+        ],
+        'sv' => [
+            'meeting_link' => 'Länk till Online-möte'
+        ]
+    ];
+
 
     /**
      * Safely retrieve a value from an associative array.
@@ -306,14 +342,14 @@ class Helpers
      *
      * @return string The formatted HTML content with links and numbers.
      */
-    public function formatVirtualLink(array $meeting, array $formats): string
+    public function formatVirtualLink(array $meeting, array $formats, string $weekdayLanguage): string
     {
         $content = '';
         if ($this->isValidUrl($meeting['virtual_meeting_link'])) {
             if (in_array("HY", $formats)) {
                 $content .= '<br>';
             }
-            $content .= '<a href="' . $meeting['virtual_meeting_link'] . '" target="new" class="um_virtual_a">Online Meeting Link</a>';
+            $content .= '<a href="' . $meeting['virtual_meeting_link'] . '" target="new" class="um_virtual_a">' . $this->translateText('meeting_link', $weekdayLanguage) . '</a>';
         }
         if ($this->validateNumber($meeting['phone_meeting_number'])) {
             if ($this->isValidUrl($meeting['virtual_meeting_link'])) {
@@ -360,13 +396,12 @@ class Helpers
      * @param array    $meeting          The meeting data to be formatted.
      * @param string[] $daysOfTheWeek  An array of days of the week.
      * @param string   $inTimeFormat    The format for displaying meeting times.
-     * @param string   $currentWeekday  The current weekday.
      * @param bool     $inBlock         True if the meeting should be in a block element, false for table row.
      * @param int      $alt              An integer representing the alternative styling (0 or 1).
      *
      * @return string Containing the formatted HTML content.
      */
-    public function formatMeeting(array $meeting, array $daysOfTheWeek, string $inTimeFormat, string $currentWeekday, bool $inBlock, int $alt): string
+    public function formatMeeting(array $meeting, array $daysOfTheWeek, string $inTimeFormat, bool $inBlock, int $alt, string $weekdayLanguage): string
     {
         $weekday = htmlspecialchars($daysOfTheWeek[intval($meeting['weekday_tinyint'])]);
         $time = $this->buildMeetingTime($meeting['start_time'], $inTimeFormat);
@@ -374,14 +409,14 @@ class Helpers
         $formats = htmlspecialchars(trim(stripslashes($meeting['formats'])));
         $formatsArray = explode(",", $formats);
         $address = $this->formatLocation($meeting);
-        $content = $inBlock ? '<div class="bmlt_simple_meeting_one_meeting_div bmlt_alt_' . intval($alt) . '">' : '<tr class="bmlt_simple_meeting_one_meeting_tr bmlt_alt_' . intval($alt) . '">';
+        $content = $inBlock ? '<div class="bmlt_simple_meeting_one_meeting_div bmlt_alt_' . $alt . '">' : '<tr class="bmlt_simple_meeting_one_meeting_tr bmlt_alt_' . $alt . '">';
         $content .= $inBlock ? '<div class="bmlt_simple_meeting_one_meeting_town_div">' : '<td class="bmlt_simple_meeting_one_meeting_town_td">';
         // Is Meeting Virtual Only
         if (in_array("VM", $formatsArray) && !in_array("HY", $formatsArray)) {
-            $content .= $this->formatVirtualLink($meeting, $formatsArray);
+            $content .= $this->formatVirtualLink($meeting, $formatsArray, $weekdayLanguage);
         } else if (in_array("HY", $formatsArray)) {
             $content .= $this->formatLocation($meeting, ['location_municipality']);
-            $content .= $this->formatVirtualLink($meeting, $formatsArray);
+            $content .= $this->formatVirtualLink($meeting, $formatsArray, $weekdayLanguage);
         } else {
             $content .= $this->formatLocation($meeting, ['location_municipality']);
         }
@@ -466,7 +501,7 @@ class Helpers
                         if (count($meeting) > count($keys)) {
                             $keys[] = 'unused';
                         }
-                        $content .= $this->formatMeeting($meeting, $daysOfTheWeek, $inTimeFormat, $currentWeekday, $inBlock, $alt);
+                        $content .= $this->formatMeeting($meeting, $daysOfTheWeek, $inTimeFormat, $inBlock, $alt, $weekdayLanguage);
                         ;
                     }
                 }
@@ -543,7 +578,7 @@ class Helpers
             // Virtual Meeting
             if (in_array("VM", $formats)) {
                 if ($this->isValidUrl($meeting['virtual_meeting_link'])) {
-                    $content .= '<div class="upcoming-meetings-virtual-link"><a href="' . $meeting['virtual_meeting_link'] . '" target="new" class="um_virtual_a">' . $meeting['virtual_meeting_link'] . '</a></div>';
+                    $content .= '<div class="upcoming-meetings-virtual-link"><a href="' . $meeting['virtual_meeting_link'] . '" target="new" class="um_virtual_a">' . $this->translateText('meeting_link', $weekdayLanguage) . '</a></div>';
                 }
                 if ($meeting['virtual_meeting_additional_info']) {
                     $content .= '<div class="upcoming-meetings-virtual-additional-info">' . $meeting['virtual_meeting_additional_info'] . '</div>';
@@ -626,5 +661,29 @@ class Helpers
             }
         }
         return $dow;
+    }
+
+    /**
+     * Translate text to the specified language with fallback to 'en' language.
+     *
+     * @param string $key      The key for the text you want to translate.
+     * @param string $language (Optional) The target language for the translation. Default is 'en'.
+     *
+     * @return string The translated text, 'en' translation, or the input key if not found.
+     */
+    public function translateText(string $key, string $language = 'en'): string
+    {
+        if (array_key_exists($language, self::TRANSLATIONS)) {
+            if (array_key_exists($key, self::TRANSLATIONS[$language])) {
+                return self::TRANSLATIONS[$language][$key];
+            }
+        }
+        if (array_key_exists('en', self::TRANSLATIONS)) {
+            if (array_key_exists($key, self::TRANSLATIONS['en'])) {
+                return self::TRANSLATIONS['en'][$key];
+            }
+        }
+        // If the language, key, or 'en' translation is not found, return the input key
+        return $key;
     }
 }
