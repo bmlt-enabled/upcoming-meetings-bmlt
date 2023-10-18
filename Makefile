@@ -29,6 +29,10 @@ lint: composer ## PHP Lint
 lint-fix: composer ## PHP Lint Fix
 	vendor/squizlabs/php_codesniffer/bin/phpcbf
 
+.PHONY: docs
+docs:  ## Generate Docs
+	docker run --rm -v $(shell pwd):/data phpdoc/phpdoc:3 --ignore=vendor/ run -d . -t docs/
+
 .PHONY: dev
 dev:  ## Docker up
 	docker-compose up

@@ -73,6 +73,12 @@
         <p>To display the location name using the simple display add location_text="1"</p>
         <p>Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot; location_text=&quot;1&quot;]</p>
     </div>
+    <h3 class="help-accordian"><strong>&nbsp;&nbsp;&nbsp;&nbsp;- show_header</strong></h3>
+    <div>
+        <p><strong>show_header</strong></p>
+        <p>To display header info for Table/Block display add show_header="1"</p>
+        <p>Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot; show_header=&quot;1&quot;]</p>
+    </div>
     <h3 class="help-accordian"><strong>&nbsp;&nbsp;&nbsp;&nbsp;- time_format</strong></h3>
     <div>
         <p><strong>time_format</strong></p>
@@ -82,7 +88,7 @@
     <h3 class="help-accordian"><strong>&nbsp;&nbsp;&nbsp;&nbsp;- weekday_language</strong></h3>
     <div>
         <p><strong>weekday_language</strong></p>
-        <p>This allows you to change the language of the weekday names. To change language to danish set weekday_language="dk". Currently supported languages are Danish and English, the default is English.</p>
+        <p>This allows you to change the language of the weekday names. To change language to danish set weekday_language="dk". Currently supported languages are da,de,en,es,fa,fr,it,pl,pt,ru,sv, the default is English.</p>
         <p>Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot; weekday_language=&quot;dk"]</p>
     </div>
     <h3 class="help-accordian"><strong>&nbsp;&nbsp;&nbsp;&nbsp;- custom_query</strong></h3>

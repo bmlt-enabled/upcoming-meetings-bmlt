@@ -47,10 +47,13 @@ Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot
 **location_text** to display the location nam,e using the simple display add location_text=&quot;1&quot;
 Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot; location_text=&quot;1&quot;]
 
+**show_header** to display header info for Table/Block display add show_header=&quot;1&quot;
+Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot; show_header=&quot;1&quot;]
+
 **time_format** This allows you to be able to switch between 12 and 24 hour. the default is 12. To switch to 24 hour add time_format=&quot;24&quot;
 Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; time_format=&quot;24&quot;]
 
-**weekday_language** This allows you to change the language of the weekday names. To change language to danish set weekday_language=&quot;dk&quot;. Currently supported languages are Danish and English, the default is English.
+**weekday_language** This allows you to change the language of the weekday names. To change language to danish set weekday_language=&quot;dk&quot;. Currently supported languages are da,de,en,es,fa,fr,it,pl,pt,ru,sv, the default is English.
 Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; weekday_language=&quot;dk&quot;]
 
 **custom_query** You can add a custom query from semantic api to filter results, for ex by format `&formats=54`.
@@ -86,6 +89,9 @@ This section describes how to install the plugin and get it working.
 
 = 1.5.0 =
 
+* Now shows virtual meeting info in table/block html display types.
+* Added option to show header info for Table/Block display.
+* Added support for all standard BMLT languages.
 * Refactored codebase.
 
 = 1.4.2 =
