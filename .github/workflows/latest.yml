@@ -11,7 +11,7 @@ jobs:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     steps:
       - name: Check out code 🛒
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup PHP 🐫
         uses: shivammathur/setup-php@v2
@@ -22,7 +22,7 @@ jobs:
         id: php-codesniffer
         run: make lint
 
-      - uses: act10ns/slack@v1
+      - uses: act10ns/slack@v2
         with:
           status: ${{ job.status }}
           steps: ${{ toJson(steps) }}
@@ -44,7 +44,7 @@ jobs:
     needs: [ lint ]
     steps:
       - name: Check out code 🛒
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         id: code-checkout
 
       - name: Prepare to deploy 🔧
@@ -56,7 +56,7 @@ jobs:
           mkdir -p ${DIST_DIR_S3} && cp ${BUILD_DIR}/${ZIP_FILENAME} ${DIST_DIR_S3}/${ZIP_FILENAME}
 
       - name: configure aws credentials 🪪
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions/gh-ci-s3-artifact
           role-session-name: gh-actions-${{ env.PLUGIN }}
@@ -68,13 +68,13 @@ jobs:
 
       - name: Publish Release to Latest WP 🎉
         id: publish_latest
-        uses: bmlt-enabled/wordpress-releases-github-action@v1
+        uses: bmlt-enabled/wordpress-releases-github-action@v1.3
         with:
           file: ${{ env.DIST_DIR_S3 }}/${{ env.ZIP_FILENAME }}
           s3_key: ${{ env.S3_KEY }}
           aws_account_id: ${{ secrets.AWS_ACCOUNT_ID }}
 
-      - uses: act10ns/slack@v1
+      - uses: act10ns/slack@v2
         with:
           status: ${{ job.status }}
           steps: ${{ toJson(steps) }}

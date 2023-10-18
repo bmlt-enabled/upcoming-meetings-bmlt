@@ -42,6 +42,6 @@
     rules here.
 
     -->
-    <rule ref='PSR2'></rule>
+    <rule ref='PSR12'></rule>
     <rule ref="PSR1"></rule>
 </ruleset>
