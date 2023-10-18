@@ -122,7 +122,7 @@ class UpcomingMeetings
      */
     public function enqueueFrontendFiles(): void
     {
-        wp_enqueue_style('upcoming-meetings', plugin_dir_url(__FILE__) . 'css/upcoming_meetings.css', false, '1.15', 'all');
+        wp_enqueue_style('upcoming-meetings', plugin_dir_url(__FILE__) . 'css/upcoming_meetings.css', false, '1.5.0', 'all');
     }
 
     /**
