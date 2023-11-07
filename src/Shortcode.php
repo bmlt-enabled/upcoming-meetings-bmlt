@@ -62,6 +62,11 @@ class Shortcode
             return $servicesErrorMessage;
         }
 
+        # TZ must be valid so we default to one if it isn't
+        if (!in_array($args['timezone'], \DateTimeZone::listIdentifiers(\DateTimeZone::ALL))) {
+            $args['timezone'] = 'America/New_York';
+        }
+
         // Custom CSS
         $content = "<style>{$this->settings->options['custom_css_um']}</style>";
 
