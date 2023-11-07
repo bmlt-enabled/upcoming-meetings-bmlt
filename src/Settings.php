@@ -79,7 +79,7 @@ class Settings
         $this->options['recursive']                  = isset($_POST['recursive']) ? sanitize_text_field($_POST['recursive']) : '';
         $this->options['grace_period_dropdown']      = isset($_POST['grace_period_dropdown']) ? sanitize_text_field($_POST['grace_period_dropdown']) : '';
         $this->options['num_results_dropdown']       = isset($_POST['num_results_dropdown']) ? sanitize_text_field($_POST['num_results_dropdown']) : '';
-        $this->options['timezones_dropdown']         = isset($_POST['timezones_dropdown']) ? sanitize_text_field($_POST['timezones_dropdown']) : '';
+        $this->options['timezones_dropdown']         = isset($_POST['timezones_dropdown']) ? sanitize_text_field($_POST['timezones_dropdown']) : 'America/New_York';
         $this->options['display_type_dropdown']      = isset($_POST['display_type_dropdown']) ? sanitize_text_field($_POST['display_type_dropdown']) : '';
         $this->options['location_text_checkbox']     = isset($_POST['location_text_checkbox']) ? sanitize_text_field($_POST['location_text_checkbox']) : '';
         $this->options['show_header_checkbox']       = isset($_POST['show_header_checkbox']) ? sanitize_text_field($_POST['show_header_checkbox']) : '';
@@ -364,7 +364,7 @@ class Settings
                 'recursive'                 => '0',
                 'grace_period_dropdown'     => '15',
                 'num_results_dropdown'      => '5',
-                'timezones_dropdown'        => get_option('timezone_string'),
+                'timezones_dropdown'        => 'America/New_York',
                 'display_type_dropdown'     => 'simple',
                 'location_text_checkbox'    => '0',
                 'show_header_checkbox'      => '0',
