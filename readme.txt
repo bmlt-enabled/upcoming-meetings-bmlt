@@ -89,7 +89,7 @@ This section describes how to install the plugin and get it working.
 
 = 1.5.1 =
 
-* Fix for TimeZones not working properly.
+* Fix for TimeZones not being validated properly and set default.
 
 = 1.5.0 =
 
