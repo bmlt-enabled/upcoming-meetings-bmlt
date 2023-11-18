@@ -5,8 +5,8 @@ Plugin URI: https://wordpress.org/plugins/upcoming-meetings-bmlt/
 Tags: bmlt, basic meeting list toolbox, Upcoming Meetings, Upcoming Meetings BMLT, narcotics anonymous, na
 Requires at least: 4.0
 Requires PHP: 8.0
-Tested up to: 6.4.0
-Stable tag: 1.5.1
+Tested up to: 6.4.1
+Stable tag: 1.5.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -76,7 +76,7 @@ This section describes how to install the plugin and get it working.
 1. Download and install the plugin from WordPress dashboard. You can also upload the entire Upcoming Meetings BMLT Plugin folder to the /wp-content/plugins/ directory
 2. Activate the plugin through the Plugins menu in WordPress
 3. Add [upcoming_meetings] shortcode to your WordPress page/post.
-4. At a minimum assign root_server, services and timezone attributes.
+4. At a minimum assign root_server, and services attributes.
 
 == Screenshots ==
 
@@ -87,13 +87,16 @@ This section describes how to install the plugin and get it working.
 
 == Changelog ==
 
+= 1.5.2 =
+
+* Fix for default to wp system timezone.
+
 = 1.5.1 =
 
 * Fix for TimeZones not being validated properly and set default.
 
 = 1.5.0 =
 
-* Note this version requires BMLT Root Server version 3.04 or greater.
 * Now shows virtual meeting info in table/block html display types.
 * Added option to show header info for Table/Block display.
 * Added support for all standard BMLT languages.

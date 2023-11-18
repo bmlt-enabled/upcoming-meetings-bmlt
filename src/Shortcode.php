@@ -62,8 +62,12 @@ class Shortcode
             return $servicesErrorMessage;
         }
 
+        $timezones = array_map(function ($e) {
+            return strtolower($e);
+        }, \DateTimeZone::listIdentifiers());
+
         # TZ must be valid so we default to one if it isn't
-        if (!in_array($args['timezone'], \DateTimeZone::listIdentifiers(\DateTimeZone::ALL))) {
+        if (!in_array(strtolower($args['timezone']), $timezones)) {
             $args['timezone'] = 'America/New_York';
         }
 

@@ -195,7 +195,7 @@ class Settings
                             <select style="display:inline;" id="timezones_dropdown" name="timezones_dropdown" class="upcoming_meetings_service_body_select">
                                 <option value=""></option>
                                 <?php
-                                $timezones_array = \DateTimeZone::listIdentifiers(\DateTimeZone::ALL);
+                                $timezones_array = \DateTimeZone::listIdentifiers();
                                 foreach ($timezones_array as $tzItem) {
                                     if ($tzItem == $this->options['timezones_dropdown']) { ?>
                                         <option selected="selected" value="<?php echo $tzItem; ?>"><?php echo $tzItem; ?></option>
@@ -364,13 +364,14 @@ class Settings
                 'recursive'                 => '0',
                 'grace_period_dropdown'     => '15',
                 'num_results_dropdown'      => '5',
-                'timezones_dropdown'        => 'America/New_York',
+                'timezones_dropdown'        => get_option('timezone_string') ? get_option('timezone_string') : 'America/New_York',
                 'display_type_dropdown'     => 'simple',
                 'location_text_checkbox'    => '0',
                 'show_header_checkbox'      => '0',
-                'time_format'               => '12',
+                'time_format_dropdown'      => '12',
                 'weekday_language_dropdown' => 'en',
-                'custom_query'              => ''
+                'custom_query'              => '',
+                'custom_css_um'             => ''
             ];
             update_option($this->optionsName, $theOptions);
         }

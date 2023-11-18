@@ -6,6 +6,9 @@
   "authors": [
     {
       "name": "pjaudiomv"
+    },
+    {
+      "name": "bmlt-enabled"
     }
   ],
   "require-dev": {

@@ -1,5 +1,5 @@
 <h2>Instructions</h2>
-<p> Please open a ticket <a href="https://github.com/pjaudiomv/upcoming-meetings-bmlt/issues" target="_top">https://github.com/pjaudiomv/upcoming-meetings-bmlt/issues</a> with problems, questions or comments.</p>
+<p> Please open a ticket <a href="https://github.com/bmlt-enabled/upcoming-meetings-bmlt/issues" target="_top">https://github.com/pjaudiomv/upcoming-meetings-bmlt/issues</a> with problems, questions or comments.</p>
 <div id="upcoming_meetings_accordion">
     <h3 class="help-accordian"><strong>Basic</strong></h3>
     <div>

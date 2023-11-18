@@ -292,16 +292,21 @@ class Helpers
         int $numResults,
         string $customQuery
     ): array {
-        $time_zone = new \DateTimeZone($timezone);
 
-        $currentTime = new \DateTime(null, $time_zone);
+        $modifiedServicesString = '';
+        foreach (explode(',', $services) as $id) {
+            $modifiedServicesString .= '&services[]=' . $id;
+        }
+
+        $time_zone = new \DateTimeZone($timezone);
+        $currentTime = new \DateTime('now', $time_zone);
         $currentTime->sub(new \DateInterval('PT' . $gracePeriod . 'M'));
         $hour = $currentTime->format('G');
         $minute = $currentTime->format('i');
         $dayOfWeek = intval($currentTime->format('w')) + 1;
         $nextDayOfWeek = ($dayOfWeek % 7) + 1;
         $url = $rootServer . "/client_interface/json/?switcher=GetSearchResults" .
-            "&weekdays={$dayOfWeek}&services={$services}" .
+            "&weekdays={$dayOfWeek}$modifiedServicesString" .
             "&StartsAfterH={$hour}&StartsAfterM={$minute}{$customQuery}" .
             ($recursive == "1" ? "&recursive=1" : "");
         $results = $this->httpGet($url);
@@ -314,7 +319,7 @@ class Helpers
 
         if ($results_count < $numResults) {
             $url_addtl = $rootServer . "/client_interface/json/?switcher=GetSearchResults" .
-                "&weekdays={$nextDayOfWeek}&services={$services}{$customQuery}" .
+                "&weekdays={$nextDayOfWeek}{$modifiedServicesString}{$customQuery}" .
                 ($recursive == "1" ? "&recursive=1" : "");
             $results_addtl = $this->httpGet($url_addtl);
             if (isset($results_addtl['error'])) {
