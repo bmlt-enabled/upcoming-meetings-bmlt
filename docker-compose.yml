@@ -7,8 +7,8 @@ services:
     build: .
     restart: always
     ports:
-      - 8080:80
-      - 7443:443
+      - "8080:80"
+      - "7443:443"
     environment:
       WORDPRESS_DEBUG: true
       WORDPRESS_DB_HOST: db:3306
@@ -23,7 +23,7 @@ services:
     image: mariadb:10.11
     restart: always
     ports:
-      - 3306:3306
+      - "3306:3306"
     environment:
       MARIADB_ROOT_PASSWORD: somewordpress
       MARIADB_DATABASE: wordpress

@@ -49,6 +49,16 @@ class Shortcode
     {
         $defaults = $this->getDefaultValues();
         $args = shortcode_atts($defaults, $atts);
+        $missing_extensions = [];
+        if (!extension_loaded('date')) {
+            $missing_extensions[] = 'datetimezone';
+        }
+        if (!extension_loaded('intl')) {
+            $missing_extensions[] = 'intl';
+        }
+        if (!empty($missing_extensions)) {
+            return '<p><strong>Upcoming Meetings Error: The following Required PHP modules are not installed: ' . implode(', ', $missing_extensions) . '.</strong></p>';
+        }
 
         // Error messages
         $rootServerErrorMessage = '<p><strong>Upcoming Meetings Error: Root Server missing. Please Verify you have entered a Root Server.</strong></p>';
