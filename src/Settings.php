@@ -134,6 +134,18 @@ class Settings
         ?>
         <div class="wrap">
             <h2>Upcoming Meetings BMLT</h2>
+            <?php
+            $missing_extensions = [];
+            if (!extension_loaded('date')) {
+                $missing_extensions[] = 'datetimezone';
+            }
+            if (!extension_loaded('intl')) {
+                $missing_extensions[] = 'intl';
+            }
+            if (!empty($missing_extensions)) {
+                echo '<h3 style="color: red;">The following Required PHP modules are not installed: ' . implode(', ', $missing_extensions) . '.</h3>';
+            }
+            ?>
             <form style="display:inline!important;" method="POST" id="upcoming_meetings_options" name="upcoming_meetings_options">
                 <?php wp_nonce_field('upcomingmeetingsupdate-options'); ?>
 
