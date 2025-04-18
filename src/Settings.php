@@ -111,14 +111,20 @@ class Settings
      */
     private function getConnectionStatus(): array
     {
-        $this_connected = $this->helper->testRootServer($this->options['root_server']);
-        return $this_connected ? [
-            'msg' => "<span style='color: #00AD00;'><div style='font-size: 16px;vertical-align: text-top;' class='dashicons dashicons-smiley'></div>Version {$this_connected}</span>",
-            'status' => true
-        ] : [
-            'msg' => "<p><div style='color: #f00;font-size: 16px;vertical-align: text-top;' class='dashicons dashicons-no'></div><span style='color: #f00;'>Connection to Root Server Failed.  Check spelling or try again.  If you are certain spelling is correct, Root Server could be down.</span></p>",
-            'status' => false
-        ];
+        $connection_result = $this->helper->testRootServer($this->options['root_server']);
+
+        if ($connection_result && is_string($connection_result) && !stripos($connection_result, 'error')) {
+            return [
+                'msg' => "<span style='color: #00AD00;'><div style='font-size: 16px;vertical-align: text-top;' class='dashicons dashicons-smiley'></div>Version {$connection_result}</span>",
+                'status' => true
+            ];
+        } else {
+            $error_message = is_string($connection_result) && stripos($connection_result, 'error') ? $connection_result : "Connection to Root Server Failed. Check spelling or try again. If you are certain spelling is correct, Root Server could be down.";
+            return [
+                'msg' => "<p><div style='color: #f00;font-size: 16px;vertical-align: text-top;' class='dashicons dashicons-no'></div><span style='color: #f00;'>{$error_message}</span></p>",
+                'status' => false
+            ];
+        }
     }
 
     /**
@@ -170,25 +176,42 @@ class Settings
                         <li>
                             <label for="service_body_dropdown">Default Service Body: </label>
                             <select style="display:inline;" onchange="getUpcomingMeetingsValueSelected()" id="service_body_dropdown" name="service_body_dropdown" class="upcoming_meetings_service_body_select">
-                                <?php if ($connectionStatus['status']) { ?>
-                                    <?php $unique_areas = $this->helper->getAreas($this->options['root_server']); ?>
-                                    <?php asort($unique_areas); ?>
-                                    <?php foreach ($unique_areas as $key => $unique_area) { ?>
-                                        <?php $area_data          = explode(',', $unique_area); ?>
-                                        <?php $area_name          = $this->helper->arraySafeGet($area_data, 0); ?>
-                                        <?php $area_id            = $this->helper->arraySafeGet($area_data, 1); ?>
-                                        <?php $area_parent        = $this->helper->arraySafeGet($area_data, 2); ?>
-                                        <?php $area_parent_name   = $this->helper->arraySafeGet($area_data, 3); ?>
-                                        <?php $option_description = $area_name . " (" . $area_id . ") " . $area_parent_name . " (" . $area_parent . ")" ?>
-                                        <?php $is_data = explode(',', esc_html($this->options['service_body_dropdown'])); ?>
-                                        <?php if ($area_id == $this->helper->arraySafeGet($is_data, 1)) { ?>
+                                <?php
+                                // Get existing selection data
+                                $current_selection = $this->options['service_body_dropdown'];
+                                $is_data = explode(',', esc_html($current_selection));
+                                $area_id = $this->helper->arraySafeGet($is_data, 1);
+                                $area_name = $this->helper->arraySafeGet($is_data, 0);
+
+                                // Try to get service bodies if connected
+                                $unique_areas = [];
+                                if ($connectionStatus['status']) {
+                                    $unique_areas = $this->helper->getAreas($this->options['root_server']);
+                                    asort($unique_areas);
+
+                                    foreach ($unique_areas as $key => $unique_area) {
+                                        $area_data = explode(',', $unique_area);
+                                        $unique_area_name = $this->helper->arraySafeGet($area_data, 0);
+                                        $unique_area_id = $this->helper->arraySafeGet($area_data, 1);
+                                        $area_parent = $this->helper->arraySafeGet($area_data, 2);
+                                        $area_parent_name = $this->helper->arraySafeGet($area_data, 3);
+                                        $option_description = $unique_area_name . " (" . $unique_area_id . ") " . $area_parent_name . " (" . $area_parent . ")";
+
+                                        if ($unique_area_id == $area_id) { ?>
                                             <option selected="selected" value="<?php echo $unique_area; ?>"><?php echo $option_description; ?></option>
                                         <?php } else { ?>
                                             <option value="<?php echo $unique_area; ?>"><?php echo $option_description; ?></option>
-                                        <?php } ?>
+                                        <?php }
+                                    }
+                                } else {
+                                    // When not connected, show the current selection if it exists
+                                    if (!empty($current_selection)) { ?>
+                                        <option selected="selected" value="<?php echo $current_selection; ?>">
+                                            <?php echo !empty($area_name) ? $area_name . ' (' . $area_id . ')' : 'Previously Selected Service Body'; ?>
+                                        </option>
                                     <?php } ?>
-                                <?php } else { ?>
-                                    <option selected="selected" value="<?php echo $this->options['service_body_dropdown']; ?>"><?php echo 'Not Connected - Can not get Service Bodies'; ?></option>
+                                    <!-- Add a note explaining the situation -->
+                                    <option disabled value="">Not Connected - Update Root Server URL and save to see options</option>
                                 <?php } ?>
                             </select>
                             <div style="display:inline; margin-left:15px;" id="txtSelectedValues1"></div>

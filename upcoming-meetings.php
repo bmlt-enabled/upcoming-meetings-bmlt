@@ -6,7 +6,7 @@ Plugin URI: https://wordpress.org/plugins/upcoming-meetings-bmlt/
 Contributors: pjaudiomv, bmltenabled
 Author: bmlt-enabled
 Description: Upcoming Meetings BMLT is a plugin that displays the next 'N' number of meetings from the current time on your page or in a widget using the upcoming_meetings shortcode.
-Version: 1.5.3
+Version: 1.5.4
 Install: Drop this directory into the "wp-content/plugins/" directory and activate it.
 */
 /* Disallow direct access to the plugin file */

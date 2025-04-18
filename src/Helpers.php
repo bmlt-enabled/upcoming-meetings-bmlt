@@ -164,19 +164,26 @@ class Helpers
      *
      * @param string $rootServer The root server URL to test.
      *
-     * @return string The version information of the root server if available. If the server is
-     *               not responsive or an error occurs, an empty string is returned.
+     * @return string|bool The version information of the root server if available, a specific error message,
+     *                    or false if the server is not responsive or an error occurs.
      */
-    public function testRootServer(string $rootServer): string
+    public function testRootServer(string $rootServer): string|bool
     {
-        if (!$rootServer) {
-            return '';
+        if (empty($rootServer)) {
+            return "Error: Root server URL is empty";
         }
+
         $response = $this->getRemoteResponse($rootServer, [], 'GetServerInfo');
+
         if (isset($response['error'])) {
-            return $response['error'];
+            return "Error: " . $response['error'];
         }
-        return (isset($response[0]) && is_array($response[0]) && array_key_exists("version", $response[0])) ? $response[0]["version"] : '';
+
+        if (!isset($response[0]) || !is_array($response[0]) || !array_key_exists("version", $response[0])) {
+            return "Error: Invalid server response format";
+        }
+
+        return $response[0]["version"];
     }
 
     /**
@@ -188,9 +195,14 @@ class Helpers
      * @param string $rootServer The root server URL from which to fetch service bodies data.
      *
      * @return array An array containing service bodies data, typically in associative format.
+     *               Returns an array with an 'error' key if an error occurs.
      */
     public function getServiceBodies(string $rootServer): array
     {
+        if (empty($rootServer)) {
+            return ['error' => 'Root server URL is empty.'];
+        }
+
         return $this->getRemoteResponse($rootServer, [], 'GetServiceBodies');
     }
 
@@ -209,6 +221,11 @@ class Helpers
     public function getAreas(string $rootServer): array
     {
         $results = $this->getServiceBodies($rootServer);
+
+        // Check if results contain an error
+        if (empty($results) || isset($results['error'])) {
+            return [];
+        }
 
         $uniqueAreas = [];
         foreach ($results as $value) {
