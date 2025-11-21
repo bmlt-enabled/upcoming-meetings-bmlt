@@ -93,6 +93,7 @@ This section describes how to install the plugin and get it working.
 = 1.5.6 =
 
 * Fix for undefined array key error when upgrading from older versions.
+* CSS enhancements for block display.
 
 = 1.5.5 =
 
