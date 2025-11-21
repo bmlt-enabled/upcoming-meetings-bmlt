@@ -404,6 +404,10 @@ class Helpers
             }
             $content .= '<a href="tel:' . $meeting['phone_meeting_number'] . '" target="new" class="um_tel_a">' . $meeting['phone_meeting_number'] . '</a>';
         }
+        // Add virtual meeting additional info for any virtual or hybrid meetings
+        if ((in_array("VM", $formats) || in_array("HY", $formats)) && $meeting['virtual_meeting_additional_info']) {
+            $content .= '<br>' . htmlspecialchars($meeting['virtual_meeting_additional_info']);
+        }
         return $content;
     }
 
@@ -424,10 +428,9 @@ class Helpers
 
         $content = '<a href="' . $mapUrl . '" target="_blank">' . $address . '</a>';
 
-        if (in_array("HY", $formats) && $meeting['virtual_meeting_additional_info']) {
-            $content .= '&nbsp;&nbsp;&nbsp;' . $meeting['virtual_meeting_additional_info'];
-        } else if (in_array("VM", $formats) && $meeting['virtual_meeting_additional_info']) {
-            $content = $meeting['virtual_meeting_additional_info'];
+        // For VM-only meetings, don't show address info (it's all in the Location column)
+        if (in_array("VM", $formats) && !in_array("HY", $formats)) {
+            $content = '';
         }
 
         return $content;
