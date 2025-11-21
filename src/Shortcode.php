@@ -93,7 +93,7 @@ class Shortcode
             $args['recursive'],
             $args['num_results'],
             $args['custom_query'],
-            $args['limit_to_today']
+            (bool)($args['limit_to_today'] ?? false)
         );
 
         // Time format
@@ -133,7 +133,7 @@ class Shortcode
             'time_format'       => $this->settings->options['time_format_dropdown'] ?? '',
             'weekday_language'  => $this->settings->options['weekday_language_dropdown'],
             'show_header'       => $this->settings->options['show_header_checkbox'],
-            'limit_to_today'    => $this->settings->options['limit_to_today_checkbox'],
+            'limit_to_today'    => $this->settings->options['limit_to_today_checkbox'] ?? '0',
             'custom_query'      => $this->settings->options['custom_query']
         ];
     }
