@@ -83,6 +83,7 @@ class Settings
         $this->options['display_type_dropdown']      = isset($_POST['display_type_dropdown']) ? sanitize_text_field($_POST['display_type_dropdown']) : '';
         $this->options['location_text_checkbox']     = isset($_POST['location_text_checkbox']) ? sanitize_text_field($_POST['location_text_checkbox']) : '';
         $this->options['show_header_checkbox']       = isset($_POST['show_header_checkbox']) ? sanitize_text_field($_POST['show_header_checkbox']) : '';
+        $this->options['limit_to_today_checkbox']    = isset($_POST['limit_to_today_checkbox']) ? sanitize_text_field($_POST['limit_to_today_checkbox']) : '';
         $this->options['time_format_dropdown']       = isset($_POST['time_format_dropdown']) ? sanitize_text_field($_POST['time_format_dropdown']) : '';
         $this->options['weekday_language_dropdown']  = isset($_POST['weekday_language_dropdown']) ? sanitize_text_field($_POST['weekday_language_dropdown']) : '';
         $this->options['custom_query']               = isset($_POST['custom_query']) ? sanitize_text_field($_POST['custom_query']) : '';
@@ -315,6 +316,10 @@ class Settings
                             <input type="checkbox" id="show_header_checkbox" name="show_header_checkbox" value="1" <?php echo ($this->options['show_header_checkbox'] == "1" ? "checked" : "") ?>/>
                             <label for="show_header_checkbox">Show Header Info (for Table/Block display)</label>
                         </li>
+                        <li>
+                            <input type="checkbox" id="limit_to_today_checkbox" name="limit_to_today_checkbox" value="1" <?php echo ($this->options['limit_to_today_checkbox'] == "1" ? "checked" : "") ?>/>
+                            <label for="limit_to_today_checkbox">Limit Results to Today Only</label>
+                        </li>
                     </ul>
                 </div>
                 <div style="padding: 0 15px;" class="postbox">
@@ -403,6 +408,7 @@ class Settings
                 'display_type_dropdown'     => 'simple',
                 'location_text_checkbox'    => '0',
                 'show_header_checkbox'      => '0',
+                'limit_to_today_checkbox'   => '0',
                 'time_format_dropdown'      => '12',
                 'weekday_language_dropdown' => 'en',
                 'custom_query'              => '',

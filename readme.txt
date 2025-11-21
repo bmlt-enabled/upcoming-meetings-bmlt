@@ -5,8 +5,8 @@ Plugin URI: https://wordpress.org/plugins/upcoming-meetings-bmlt/
 Tags: bmlt, basic meeting list toolbox, Upcoming Meetings, Upcoming Meetings BMLT, narcotics anonymous, na
 Requires at least: 4.0
 Requires PHP: 8.0
-Tested up to: 6.4.2
-Stable tag: 1.5.4
+Tested up to: 6.8
+Stable tag: 1.5.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,7 +16,7 @@ Upcoming Meetings BMLT is a plugin that displays the next 'N' number of meetings
 
 SHORTCODE
 Basic: [upcoming_meetings]
-Attributes: root_server, services, recursive, grace_period, num_results, display_type, timezone, location_text, time_format, weekday_language, custom_query
+Attributes: root_server, services, recursive, grace_period, num_results, display_type, timezone, location_text, time_format, weekday_language, limit_to_today, custom_query
 
 -- Shortcode parameters can be combined
 
@@ -56,6 +56,9 @@ Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot
 **weekday_language** This allows you to change the language of the weekday names. To change language to danish set weekday_language=&quot;dk&quot;. Currently supported languages are da,de,en,es,fa,fr,it,pl,pt,ru,sv, the default is English.
 Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; weekday_language=&quot;dk&quot;]
 
+**limit_to_today** To limit results to only today's meetings (will not show tomorrow's meetings even if there aren't enough results) add limit_to_today=&quot;1&quot;
+Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot; limit_to_today=&quot;1&quot;]
+
 **custom_query** You can add a custom query from semantic api to filter results, for ex by format `&formats=54`.
 Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; custom_query=&quot;&formats=54&quot;]
 
@@ -86,6 +89,10 @@ This section describes how to install the plugin and get it working.
 4. screenshot-4.png
 
 == Changelog ==
+
+= 1.5.5 =
+
+* Added option to limit results to only today's meetings (prevents showing tomorrow's meetings when there aren't enough today).
 
 = 1.5.4 =
 
