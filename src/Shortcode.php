@@ -92,7 +92,8 @@ class Shortcode
             $args['grace_period'],
             $args['recursive'],
             $args['num_results'],
-            $args['custom_query']
+            $args['custom_query'],
+            $args['limit_to_today']
         );
 
         // Time format
@@ -132,6 +133,7 @@ class Shortcode
             'time_format'       => $this->settings->options['time_format_dropdown'] ?? '',
             'weekday_language'  => $this->settings->options['weekday_language_dropdown'],
             'show_header'       => $this->settings->options['show_header_checkbox'],
+            'limit_to_today'    => $this->settings->options['limit_to_today_checkbox'],
             'custom_query'      => $this->settings->options['custom_query']
         ];
     }

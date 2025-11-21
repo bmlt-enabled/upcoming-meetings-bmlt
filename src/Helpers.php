@@ -296,6 +296,7 @@ class Helpers
      * @param bool   $recursive    Indicates whether to fetch recursive meetings (1 for true, 0 for false).
      * @param int    $numResults   The maximum number of meeting results to return.
      * @param string $customQuery  Custom query parameters to add to the request URL.
+     * @param bool   $limitToToday If true, only return meetings from today (don't fetch tomorrow's meetings).
      *
      * @return array An array of meeting data in JSON format if successful.
      *                If an error occurs, an error message is returned.
@@ -307,7 +308,8 @@ class Helpers
         int $gracePeriod,
         bool $recursive,
         int $numResults,
-        string $customQuery
+        string $customQuery,
+        bool $limitToToday = false
     ): array {
 
         $modifiedServicesString = '';
@@ -334,7 +336,7 @@ class Helpers
 
         $results_count = count($results);
 
-        if ($results_count < $numResults) {
+        if (!$limitToToday && $results_count < $numResults) {
             $url_addtl = $rootServer . "/client_interface/json/?switcher=GetSearchResults" .
                 "&weekdays={$nextDayOfWeek}{$modifiedServicesString}{$customQuery}" .
                 ($recursive == "1" ? "&recursive=1" : "");
