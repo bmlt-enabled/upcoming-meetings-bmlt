@@ -6,7 +6,7 @@ Plugin URI: https://wordpress.org/plugins/upcoming-meetings-bmlt/
 Contributors: pjaudiomv, bmltenabled
 Author: bmlt-enabled
 Description: Upcoming Meetings BMLT is a plugin that displays the next 'N' number of meetings from the current time on your page or in a widget using the upcoming_meetings shortcode.
-Version: 1.5.7
+Version: 1.6.0
 Install: Drop this directory into the "wp-content/plugins/" directory and activate it.
 */
 /* Disallow direct access to the plugin file */
@@ -23,6 +23,7 @@ spl_autoload_register(function (string $class) {
 
 use UpcomingMeetings\Settings;
 use UpcomingMeetings\Shortcode;
+use UpcomingMeetings\FormatsShortcode;
 
 // phpcs:disable PSR1.Classes.ClassDeclaration.MissingNamespace
 class UpcomingMeetings
@@ -62,6 +63,7 @@ class UpcomingMeetings
         } else {
             add_action("wp_enqueue_scripts", [$this, "enqueueFrontendFiles"]);
             add_shortcode('upcoming_meetings', [$this, 'showMeetings']);
+            add_shortcode('meeting_formats', [$this, 'showFormats']);
         }
     }
 
@@ -90,6 +92,21 @@ class UpcomingMeetings
     {
         $shortcode = new Shortcode();
         return $shortcode->render($atts);
+    }
+
+    /**
+     * Display meeting formats using a shortcode.
+     *
+     * This function is used to display meeting formats from a BMLT server on a WordPress page or post.
+     * It creates a new instance of the FormatsShortcode class and renders the shortcode with the provided attributes.
+     *
+     * @param array $atts An associative array of attributes passed to the shortcode.
+     * @return string The rendered content of the shortcode.
+     */
+    public function showFormats($atts): string
+    {
+        $formatsShortcode = new FormatsShortcode();
+        return $formatsShortcode->render($atts);
     }
 
     /**
@@ -122,7 +139,7 @@ class UpcomingMeetings
      */
     public function enqueueFrontendFiles(): void
     {
-        wp_enqueue_style('upcoming-meetings', plugin_dir_url(__FILE__) . 'css/upcoming_meetings.css', false, '1.5.0', 'all');
+        wp_enqueue_style('upcoming-meetings', plugin_dir_url(__FILE__) . 'css/upcoming_meetings.css', false, '1.6.0', 'all');
     }
 
     /**

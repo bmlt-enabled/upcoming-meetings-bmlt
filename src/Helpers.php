@@ -350,6 +350,41 @@ class Helpers
     }
 
     /**
+     * Retrieves JSON data for meeting formats from the specified root server.
+     *
+     * This function sends a request to the specified root server to retrieve JSON data
+     * for all meeting formats available on that server.
+     *
+     * @param string $rootServer   The root server URL from which to fetch format data.
+     * @param string $language     The language code for format names (e.g., 'en', 'es').
+     *
+     * @return array An array of format data in JSON format if successful.
+     *                If an error occurs, an error message is returned.
+     */
+    public function getFormatsJson(string $rootServer, string $language = 'en'): array
+    {
+        $formats = $this->getRemoteResponse($rootServer, [], 'GetFormats');
+
+        if (isset($formats['error'])) {
+            return ['error' => $formats['error']];
+        }
+
+        // Filter formats by language if specified
+        if ($language !== 'en') {
+            $formats = array_filter($formats, function ($format) use ($language) {
+                return isset($format['lang']) && $format['lang'] === $language;
+            });
+        }
+
+        // Sort formats by key_string
+        usort($formats, function ($a, $b) {
+            return strcmp($a['key_string'], $b['key_string']);
+        });
+
+        return array_values($formats);
+    }
+
+    /**
      * Format the meeting location based on selected parts or defaults.
      *
      * @param array $meeting         The meeting data containing location information.

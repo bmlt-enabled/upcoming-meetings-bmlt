@@ -6,7 +6,7 @@ Tags: bmlt, basic meeting list toolbox, Upcoming Meetings, Upcoming Meetings BML
 Requires at least: 4.0
 Requires PHP: 8.0
 Tested up to: 6.8
-Stable tag: 1.5.7
+Stable tag: 1.6.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -17,6 +17,9 @@ Upcoming Meetings BMLT is a plugin that displays the next 'N' number of meetings
 SHORTCODE
 Basic: [upcoming_meetings]
 Attributes: root_server, services, recursive, grace_period, num_results, display_type, timezone, location_text, time_format, weekday_language, limit_to_today, custom_query
+
+Meeting Formats: [meeting_formats]
+Attributes: root_server, display_type, show_description, language
 
 -- Shortcode parameters can be combined
 
@@ -60,7 +63,25 @@ Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot
 Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot; limit_to_today=&quot;1&quot;]
 
 **custom_query** You can add a custom query from semantic api to filter results, for ex by format `&formats=54`.
-Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; custom_query=&quot;&formats=54&quot;]
+Ex. [upcoming_meetings root_server="https://www.domain.org/main_server" custom_query="&formats=54"]
+
+== Meeting Formats Shortcode ==
+
+The meeting_formats shortcode displays all available meeting formats from a BMLT root server.
+
+Basic: [meeting_formats]
+
+**root_server** (optional) The BMLT root server URL. Uses plugin settings if not specified.
+Ex. [meeting_formats root_server="https://bmlt.sezf.org/main_server"]
+
+**display_type** (optional, default: "table") Options: "table" or "list"
+Ex. [meeting_formats display_type="list"]
+
+**show_description** (optional, default: "1") Show format descriptions. Options: "1" or "0"
+Ex. [meeting_formats show_description="0"]
+
+**language** (optional, default: "en") Language code for format names (en, es, fr, de, etc.)
+Ex. [meeting_formats language="es"]
 
 == EXAMPLES ==
 
@@ -89,6 +110,14 @@ This section describes how to install the plugin and get it working.
 4. screenshot-4.png
 
 == Changelog ==
+
+= 1.6.0 =
+* Added new [meeting_formats] shortcode to display meeting format legend.
+* Supports table and list display types with circular format code badges.
+* Includes multi-language support for format names and descriptions.
+* CSS optimized for maximum browser and theme compatibility.
+* Added vendor prefixes for better IE support.
+* Includes box-sizing resets to prevent theme conflicts.
 
 = 1.5.7 =
 * More css tweaks.
