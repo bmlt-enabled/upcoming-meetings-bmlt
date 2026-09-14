@@ -1,0 +1,8 @@
+vendor/
+build/
+dist/
+docs/
+logs/
+.git/
+.idea/
+*.zip

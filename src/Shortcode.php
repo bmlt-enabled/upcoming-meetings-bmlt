@@ -202,7 +202,9 @@ class Shortcode
         $servicesDropdown    = $this->helper->arraySafeGet($servicesDataDropdown, 1);
         return [
             'root_server'       => $this->settings->options['root_server'],
-            'services'          => $servicesDropdown,
+            // Cast to string: with no default service body configured, arraySafeGet returns null,
+            // which would break the string-typed getMeetingsJson signature when only 'meetings' is used.
+            'services'          => $servicesDropdown ?? '',
             'recursive'         => $this->settings->options['recursive'],
             'grace_period'      => $this->settings->options['grace_period_dropdown'],
             'num_results'       => $this->settings->options['num_results_dropdown'],

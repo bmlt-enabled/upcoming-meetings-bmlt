@@ -6,7 +6,7 @@ Tags: bmlt, basic meeting list toolbox, Upcoming Meetings, Upcoming Meetings BML
 Requires at least: 4.0
 Requires PHP: 8.0
 Tested up to: 7.1
-Stable tag: 1.7.0
+Stable tag: 1.7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -121,6 +121,10 @@ This section describes how to install the plugin and get it working.
 4. screenshot-4.png
 
 == Changelog ==
+
+= 1.7.1 =
+* Fixed a fatal error when using the meetings attribute without a service body configured.
+* Added an automated PHPUnit test suite.
 
 = 1.7.0 =
 * Added meetings attribute to include specific meetings by id, alongside service body results (like bread/crouton).

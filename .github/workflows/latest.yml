@@ -16,7 +16,7 @@ jobs:
       - name: Setup PHP 🐫
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
+          php-version: 8.3
 
       - name: PHPCS checker 🧹
         id: php-codesniffer
@@ -28,6 +28,49 @@ jobs:
           steps: ${{ toJson(steps) }}
           channel: '#upcoming-meetings-bmlt'
         if: failure()
+
+  test:
+    runs-on: ubuntu-22.04
+    services:
+      mysql:
+        image: mariadb:10.11
+        env:
+          MARIADB_ROOT_PASSWORD: root
+          MARIADB_DATABASE: wordpress_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+    strategy:
+      matrix:
+        php-version: ["8.3", "8.4", "8.5"]
+    steps:
+      - name: Check out code 🛒
+        uses: actions/checkout@v7
+
+      - name: Setup PHP 🐫
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: mysqli, intl
+          tools: composer
+
+      - name: Install dependencies 📦
+        run: composer install --prefer-dist --no-progress
+
+      - name: Install WordPress test suite 🔧
+        run: bash bin/install-wp-tests.sh wordpress_test root root 127.0.0.1 latest
+
+      - name: Run PHPUnit 🧪
+        run: vendor/bin/phpunit --colors=always
+        env:
+          DB_HOST: 127.0.0.1
+          DB_USER: root
+          DB_PASS: root
+          DB_NAME: wordpress_test
 
   deploy:
     runs-on: ubuntu-22.04
@@ -41,7 +84,7 @@ jobs:
       BUILD_DIR: build
       DIST_DIR_S3: dist/s3
       PLUGIN: "upcoming-meetings-bmlt"
-    needs: [ lint ]
+    needs: [ lint, test ]
     steps:
       - name: Check out code 🛒
         uses: actions/checkout@v7

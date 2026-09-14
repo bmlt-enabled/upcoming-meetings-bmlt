@@ -36,3 +36,12 @@ docs:  ## Generate Docs
 .PHONY: dev
 dev:  ## Docker up
 	docker-compose up
+
+.PHONY: test
+test:  ## Run tests in Docker (builds fresh each time)
+	docker compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from test
+	docker compose -f docker-compose.test.yml down
+
+.PHONY: test-clean
+test-clean:  ## Remove test containers and images
+	docker compose -f docker-compose.test.yml down --rmi local --volumes
