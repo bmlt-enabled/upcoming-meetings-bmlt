@@ -5,8 +5,8 @@ Plugin URI: https://wordpress.org/plugins/upcoming-meetings-bmlt/
 Tags: bmlt, basic meeting list toolbox, Upcoming Meetings, Upcoming Meetings BMLT, narcotics anonymous, na
 Requires at least: 4.0
 Requires PHP: 8.0
-Tested up to: 6.8
-Stable tag: 1.6.0
+Tested up to: 7.1
+Stable tag: 1.7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,7 +16,7 @@ Upcoming Meetings BMLT is a plugin that displays the next 'N' number of meetings
 
 SHORTCODE
 Basic: [upcoming_meetings]
-Attributes: root_server, services, recursive, grace_period, num_results, display_type, timezone, location_text, time_format, weekday_language, limit_to_today, custom_query
+Attributes: root_server, services, recursive, grace_period, num_results, display_type, timezone, location_text, time_format, weekday_language, limit_to_today, custom_query, meetings, show_area_filter, area_filter_label
 
 Meeting Formats: [meeting_formats]
 Attributes: root_server, display_type, show_description, language
@@ -25,7 +25,7 @@ Attributes: root_server, display_type, show_description, language
 
 == Usage ==
 
-A minimum of root_server, and services attributes are required, which would return the next 5 meetings in simple view with a 15minute grace period.
+A minimum of root_server, and services attributes are required (or the meetings attribute in place of services), which would return the next 5 meetings in simple view with a 15minute grace period.
 
 Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot;]
 
@@ -64,6 +64,17 @@ Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot
 
 **custom_query** You can add a custom query from semantic api to filter results, for ex by format `&formats=54`.
 Ex. [upcoming_meetings root_server="https://www.domain.org/main_server" custom_query="&formats=54"]
+
+**meetings** To include specific meetings by id in addition to (or instead of) service bodies, add a comma separated list of meeting ids. These are queried separately from the service bodies and merged into the upcoming list. When meetings is used, the services attribute is optional.
+Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; meetings=&quot;1234,5678&quot;]
+
+**show_area_filter** When displaying a region, add show_area_filter=&quot;1&quot; to show a dropdown of the region's areas above the list. Selecting an area re-queries the next meetings for just that area (keeps the list shorter). Requires the services attribute.
+Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;20&quot; recursive=&quot;1&quot; show_area_filter=&quot;1&quot;]
+
+**area_filter_label** The label shown next to the area filter dropdown (default &quot;Filter by area&quot;). Set to an empty string to hide the label.
+Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;20&quot; recursive=&quot;1&quot; show_area_filter=&quot;1&quot; area_filter_label=&quot;Choose an area&quot;]
+
+The area filter markup exposes CSS hooks for styling (also via the Custom CSS setting): the widget wrapper (.upcoming-meetings-widget, plus .upcoming-meetings-display-simple/table/block), the filter row (.upcoming-meetings-area-filter), its label (.upcoming-meetings-area-label) and dropdown (.upcoming-meetings-area-select), and the results container (.upcoming-meetings-results).
 
 == Meeting Formats Shortcode ==
 
@@ -110,6 +121,12 @@ This section describes how to install the plugin and get it working.
 4. screenshot-4.png
 
 == Changelog ==
+
+= 1.7.0 =
+* Added meetings attribute to include specific meetings by id, alongside service body results (like bread/crouton).
+* Added show_area_filter attribute/setting to display an area dropdown for regions, re-querying meetings for the selected area.
+* Table and block displays now stack into cards on mobile so meetings stay readable on small screens.
+* Fixed a PHP undefined index warning when saving settings (custom CSS field).
 
 = 1.6.0 =
 * Added new [meeting_formats] shortcode to display meeting format legend.

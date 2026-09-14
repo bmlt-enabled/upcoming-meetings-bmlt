@@ -6,7 +6,7 @@ Plugin URI: https://wordpress.org/plugins/upcoming-meetings-bmlt/
 Contributors: pjaudiomv, bmltenabled
 Author: bmlt-enabled
 Description: Upcoming Meetings BMLT is a plugin that displays the next 'N' number of meetings from the current time on your page or in a widget using the upcoming_meetings shortcode.
-Version: 1.6.0
+Version: 1.7.0
 Install: Drop this directory into the "wp-content/plugins/" directory and activate it.
 */
 /* Disallow direct access to the plugin file */
@@ -65,6 +65,49 @@ class UpcomingMeetings
             add_shortcode('upcoming_meetings', [$this, 'showMeetings']);
             add_shortcode('meeting_formats', [$this, 'showFormats']);
         }
+        // The area filter AJAX endpoint must be registered for both logged-in and anonymous
+        // visitors, and runs through admin-ajax.php (which is an admin context), so it lives outside
+        // the branch above.
+        add_action('wp_ajax_upcoming_meetings_filter', [$this, 'ajaxFilterMeetings']);
+        add_action('wp_ajax_nopriv_upcoming_meetings_filter', [$this, 'ajaxFilterMeetings']);
+    }
+
+    /**
+     * AJAX handler for the area filter: re-queries meetings scoped to the selected area and returns HTML.
+     */
+    public function ajaxFilterMeetings(): void
+    {
+        check_ajax_referer('upcoming_meetings_filter', 'nonce');
+
+        $rootServer = isset($_POST['root_server']) ? esc_url_raw(wp_unslash($_POST['root_server'])) : '';
+        if (empty($rootServer) || !wp_http_validate_url($rootServer)) {
+            wp_send_json_error('Invalid root server.', 400);
+        }
+
+        $serviceBody = isset($_POST['service_body']) ? sanitize_text_field(wp_unslash($_POST['service_body'])) : 'all';
+        $originalServices = isset($_POST['services']) ? sanitize_text_field(wp_unslash($_POST['services'])) : '';
+
+        $args = [
+            'root_server'      => $rootServer,
+            // When a specific area is chosen, scope to it recursively; otherwise keep the original region.
+            'services'         => ($serviceBody !== 'all' && $serviceBody !== '') ? $serviceBody : $originalServices,
+            'recursive'        => ($serviceBody !== 'all' && $serviceBody !== '') ? '1' : (isset($_POST['recursive']) ? sanitize_text_field(wp_unslash($_POST['recursive'])) : '0'),
+            'grace_period'     => isset($_POST['grace_period']) ? sanitize_text_field(wp_unslash($_POST['grace_period'])) : '15',
+            'num_results'      => isset($_POST['num_results']) ? sanitize_text_field(wp_unslash($_POST['num_results'])) : '5',
+            'timezone'         => isset($_POST['timezone']) ? sanitize_text_field(wp_unslash($_POST['timezone'])) : 'America/New_York',
+            'display_type'     => isset($_POST['display_type']) ? sanitize_text_field(wp_unslash($_POST['display_type'])) : 'simple',
+            'location_text'    => isset($_POST['location_text']) ? sanitize_text_field(wp_unslash($_POST['location_text'])) : '',
+            'time_format'      => isset($_POST['time_format']) ? sanitize_text_field(wp_unslash($_POST['time_format'])) : '12',
+            'weekday_language' => isset($_POST['weekday_language']) ? sanitize_text_field(wp_unslash($_POST['weekday_language'])) : 'en',
+            'show_header'      => isset($_POST['show_header']) ? sanitize_text_field(wp_unslash($_POST['show_header'])) : '0',
+            'limit_to_today'   => isset($_POST['limit_to_today']) ? sanitize_text_field(wp_unslash($_POST['limit_to_today'])) : '0',
+            'custom_query'     => isset($_POST['custom_query']) ? sanitize_text_field(wp_unslash($_POST['custom_query'])) : '',
+            'meetings'         => isset($_POST['meetings']) ? sanitize_text_field(wp_unslash($_POST['meetings'])) : '',
+        ];
+
+        $shortcode = new Shortcode();
+        echo $shortcode->buildMeetingsHtml($args);
+        wp_die();
     }
 
     /**
@@ -139,7 +182,14 @@ class UpcomingMeetings
      */
     public function enqueueFrontendFiles(): void
     {
-        wp_enqueue_style('upcoming-meetings', plugin_dir_url(__FILE__) . 'css/upcoming_meetings.css', false, '1.6.0', 'all');
+        wp_enqueue_style('upcoming-meetings', plugin_dir_url(__FILE__) . 'css/upcoming_meetings.css', false, '1.7.0', 'all');
+        // Registered here but only enqueued by the shortcode when the area filter is enabled.
+        $filterScript = plugin_dir_path(__FILE__) . 'js/upcoming_meetings.js';
+        wp_register_script('upcoming-meetings-filter', plugin_dir_url(__FILE__) . 'js/upcoming_meetings.js', [], filemtime($filterScript), true);
+        wp_localize_script('upcoming-meetings-filter', 'UpcomingMeetingsFilter', [
+            'ajaxUrl' => admin_url('admin-ajax.php'),
+            'nonce'   => wp_create_nonce('upcoming_meetings_filter'),
+        ]);
     }
 
     /**
