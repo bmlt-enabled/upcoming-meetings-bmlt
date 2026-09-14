@@ -240,6 +240,53 @@ class Helpers
         return $uniqueAreas;
     }
 
+    /**
+     * Retrieves the descendant service bodies (children, grandchildren, etc.) of the given parents.
+     *
+     * Used to build the area filter dropdown when displaying a region: given the configured
+     * service body ids, walk the parent/child hierarchy and return every service body beneath them.
+     *
+     * @param string $rootServer The root server URL from which to fetch service bodies data.
+     * @param array  $parentIds  The service body ids whose descendants should be returned.
+     *
+     * @return array An associative array of descendant service bodies, keyed by id => name, sorted by name.
+     */
+    public function getDescendantServiceBodies(string $rootServer, array $parentIds): array
+    {
+        $bodies = $this->getServiceBodies($rootServer);
+        if (empty($bodies) || isset($bodies['error'])) {
+            return [];
+        }
+
+        $childrenByParent = [];
+        $names = [];
+        foreach ($bodies as $body) {
+            if (!isset($body['id'])) {
+                continue;
+            }
+            $childrenByParent[$body['parent_id']][] = $body['id'];
+            $names[$body['id']] = $body['name'];
+        }
+
+        $descendants = [];
+        $queue = array_map('strval', $parentIds);
+        $seen = [];
+        while (!empty($queue)) {
+            $id = array_shift($queue);
+            foreach ($childrenByParent[$id] ?? [] as $childId) {
+                if (isset($seen[$childId])) {
+                    continue;
+                }
+                $seen[$childId] = true;
+                $descendants[$childId] = $names[$childId] ?? $childId;
+                $queue[] = $childId;
+            }
+        }
+
+        asort($descendants);
+        return $descendants;
+    }
+
     /*******************************************************************/
     /** \brief This creates a time string to be displayed for the meeting.
      * The display is done in non-military time, and "midnight" and
@@ -297,6 +344,8 @@ class Helpers
      * @param int    $numResults   The maximum number of meeting results to return.
      * @param string $customQuery  Custom query parameters to add to the request URL.
      * @param bool   $limitToToday If true, only return meetings from today (don't fetch tomorrow's meetings).
+     * @param string $meetings     A comma-separated list of specific meeting IDs to include in addition
+     *                             to the service body results (queried separately, like bread/crouton).
      *
      * @return array An array of meeting data in JSON format if successful.
      *                If an error occurs, an error message is returned.
@@ -309,13 +358,13 @@ class Helpers
         bool $recursive,
         int $numResults,
         string $customQuery,
-        bool $limitToToday = false
+        bool $limitToToday = false,
+        string $meetings = ''
     ): array {
 
-        $modifiedServicesString = '';
-        foreach (explode(',', $services) as $id) {
-            $modifiedServicesString .= '&services[]=' . $id;
-        }
+        $servicesQuery = $this->buildIdQuery('services', $services);
+        $meetingsQuery = $this->buildIdQuery('meeting_ids', $meetings);
+        $recursiveParam = $recursive ? '&recursive=1' : '';
 
         $time_zone = new \DateTimeZone($timezone);
         $currentTime = new \DateTime('now', $time_zone);
@@ -324,29 +373,114 @@ class Helpers
         $minute = $currentTime->format('i');
         $dayOfWeek = intval($currentTime->format('w')) + 1;
         $nextDayOfWeek = ($dayOfWeek % 7) + 1;
-        $url = $rootServer . "/client_interface/json/?switcher=GetSearchResults" .
-            "&weekdays={$dayOfWeek}$modifiedServicesString" .
-            "&StartsAfterH={$hour}&StartsAfterM={$minute}{$customQuery}" .
-            ($recursive == "1" ? "&recursive=1" : "");
-        $results = $this->httpGet($url);
 
+        // Today: only meetings starting after the current (grace-adjusted) time.
+        $results = $this->fetchDayMeetings($rootServer, $dayOfWeek, $servicesQuery, $meetingsQuery, "&StartsAfterH={$hour}&StartsAfterM={$minute}", $customQuery, $recursiveParam);
         if (isset($results['error'])) {
             return ['error' => $results['error']];
         }
 
-        $results_count = count($results);
-
-        if (!$limitToToday && $results_count < $numResults) {
-            $url_addtl = $rootServer . "/client_interface/json/?switcher=GetSearchResults" .
-                "&weekdays={$nextDayOfWeek}{$modifiedServicesString}{$customQuery}" .
-                ($recursive == "1" ? "&recursive=1" : "");
-            $results_addtl = $this->httpGet($url_addtl);
+        // If today didn't fill the list, pull tomorrow's meetings too.
+        if (!$limitToToday && count($results) < $numResults) {
+            $results_addtl = $this->fetchDayMeetings($rootServer, $nextDayOfWeek, $servicesQuery, $meetingsQuery, '', $customQuery, $recursiveParam);
             if (isset($results_addtl['error'])) {
                 return ['error' => $results_addtl['error']];
             }
             $results = array_merge($results, $results_addtl);
         }
         return array_slice($results, 0, $numResults);
+    }
+
+    /**
+     * Build a BMLT array-style id query string (e.g. "&services[]=1&services[]=2").
+     *
+     * @param string $param The query parameter name ('services' or 'meeting_ids').
+     * @param string $ids   A comma-separated list of IDs.
+     *
+     * @return string The query string fragment, or an empty string if no valid IDs were provided.
+     */
+    private function buildIdQuery(string $param, string $ids): string
+    {
+        $query = '';
+        foreach (array_filter(array_map('trim', explode(',', $ids)), 'strlen') as $id) {
+            $query .= "&{$param}[]=" . $id;
+        }
+        return $query;
+    }
+
+    /**
+     * Fetch meetings for a single weekday, combining service body and specific-meeting results.
+     *
+     * Service bodies and specific meeting IDs are queried separately (BMLT treats them as an
+     * intersection when combined), then merged, de-duplicated and ordered by start time.
+     *
+     * @param string $rootServer     The root server URL.
+     * @param int    $weekday        The BMLT weekday (1 = Sunday).
+     * @param string $servicesQuery  Pre-built "&services[]=..." fragment (may be empty).
+     * @param string $meetingsQuery  Pre-built "&meeting_ids[]=..." fragment (may be empty).
+     * @param string $timeParams     Optional "&StartsAfterH=..&StartsAfterM=.." fragment for today.
+     * @param string $customQuery    Custom query parameters to add to the request URL.
+     * @param string $recursiveParam Pre-built "&recursive=1" fragment (may be empty).
+     *
+     * @return array The meetings for the day, or an error array.
+     */
+    private function fetchDayMeetings(string $rootServer, int $weekday, string $servicesQuery, string $meetingsQuery, string $timeParams, string $customQuery, string $recursiveParam): array
+    {
+        $baseUrl = $rootServer . "/client_interface/json/?switcher=GetSearchResults&weekdays={$weekday}";
+        $dayResults = [];
+
+        if ($servicesQuery !== '') {
+            $servicesResults = $this->httpGet($baseUrl . $servicesQuery . $timeParams . $customQuery . $recursiveParam);
+            if (isset($servicesResults['error'])) {
+                return ['error' => $servicesResults['error']];
+            }
+            $dayResults = array_merge($dayResults, $servicesResults);
+        }
+
+        if ($meetingsQuery !== '') {
+            // Specific meetings are not scoped to a service body, so recursive does not apply.
+            $meetingsResults = $this->httpGet($baseUrl . $meetingsQuery . $timeParams . $customQuery);
+            if (isset($meetingsResults['error'])) {
+                return ['error' => $meetingsResults['error']];
+            }
+            $dayResults = array_merge($dayResults, $meetingsResults);
+        }
+
+        return $this->sortMeetingsByTime($this->dedupeMeetings($dayResults));
+    }
+
+    /**
+     * Remove duplicate meetings (a meeting can be returned by both the services and meeting_ids queries).
+     *
+     * @param array $meetings The meetings to de-duplicate.
+     *
+     * @return array The meetings keyed uniquely by their BMLT id.
+     */
+    private function dedupeMeetings(array $meetings): array
+    {
+        $unique = [];
+        foreach ($meetings as $meeting) {
+            if (!is_array($meeting) || !isset($meeting['id_bigint'])) {
+                continue;
+            }
+            $unique[$meeting['id_bigint']] = $meeting;
+        }
+        return array_values($unique);
+    }
+
+    /**
+     * Sort meetings chronologically by start time.
+     *
+     * @param array $meetings The meetings to sort.
+     *
+     * @return array The meetings ordered by start time.
+     */
+    private function sortMeetingsByTime(array $meetings): array
+    {
+        usort($meetings, function ($a, $b) {
+            return strcmp($a['start_time'] ?? '', $b['start_time'] ?? '');
+        });
+        return $meetings;
     }
 
     /**

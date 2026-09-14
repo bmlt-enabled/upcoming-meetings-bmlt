@@ -5,7 +5,7 @@
     <div>
         <p>[upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;12&quot;]</p>
         <p>Multiple service bodies can be added seperated by a comma like so services=&quot;12,14,15&quot;</p>
-        <strong>Attributes:</strong> root_server, services, recursive, grace_period, num_results, display_type, timezone, location_text, time_format, weekday_language, custom_query
+        <strong>Attributes:</strong> root_server, services, recursive, grace_period, num_results, display_type, timezone, location_text, time_format, weekday_language, custom_query, meetings, show_area_filter
         <p><strong>Shortcode parameters can be combined.</strong></p>
     </div>
     <h3 class="help-accordian"><strong>Shortcode Attributes</strong></h3>
@@ -22,7 +22,8 @@
         <p><strong>time_format</strong></p>
         <p><strong>weekday_language</strong></p>
         <p><strong>custom_query</strong></p>
-        <p>A minimum of root_server, and services attribute are required, which would return all towns for that service body seperated by a comma.</p>
+        <p><strong>meetings</strong></p>
+        <p>A minimum of root_server, and services attribute are required (or the meetings attribute in place of services), which would return all towns for that service body seperated by a comma.</p>
         <p>Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot;]</p>
     </div>
     <h3 class="help-accordian"><strong>&nbsp;&nbsp;&nbsp;&nbsp;- root_server</strong></h3>
@@ -96,5 +97,17 @@
         <p><strong>custom_query</strong></p>
         <p>You can add a custom query from semantic api to filter results, for ex by format `&formats=54`.</p>
         <p>Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;50&quot; custom_query=&quot;&formats=54"]</p>
+    </div>
+    <h3 class="help-accordian"><strong>&nbsp;&nbsp;&nbsp;&nbsp;- meetings</strong></h3>
+    <div>
+        <p><strong>meetings</strong></p>
+        <p>Comma separated list of specific meeting ids to include in addition to (or instead of) service bodies. These are queried separately and merged into the upcoming list. When meetings is used, the services attribute is optional.</p>
+        <p>Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; meetings=&quot;1234,5678"]</p>
+    </div>
+    <h3 class="help-accordian"><strong>&nbsp;&nbsp;&nbsp;&nbsp;- show_area_filter</strong></h3>
+    <div>
+        <p><strong>show_area_filter</strong></p>
+        <p>When displaying a region, add show_area_filter="1" to show a dropdown of the region's areas above the list. Selecting an area re-queries the next meetings for just that area, which keeps the list shorter. Requires the services attribute.</p>
+        <p>Ex. [upcoming_meetings root_server=&quot;https://www.domain.org/main_server&quot; services=&quot;20&quot; recursive=&quot;1&quot; show_area_filter=&quot;1"]</p>
     </div>
 </div>

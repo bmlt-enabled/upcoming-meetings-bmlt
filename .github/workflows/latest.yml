@@ -11,7 +11,7 @@ jobs:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
     steps:
       - name: Check out code 🛒
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup PHP 🐫
         uses: shivammathur/setup-php@v2
@@ -44,7 +44,7 @@ jobs:
     needs: [ lint ]
     steps:
       - name: Check out code 🛒
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         id: code-checkout
 
       - name: Prepare to deploy 🔧
@@ -56,7 +56,7 @@ jobs:
           mkdir -p ${DIST_DIR_S3} && cp ${BUILD_DIR}/${ZIP_FILENAME} ${DIST_DIR_S3}/${ZIP_FILENAME}
 
       - name: configure aws credentials 🪪
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions/gh-ci-s3-artifact
           role-session-name: gh-actions-${{ env.PLUGIN }}
@@ -68,7 +68,7 @@ jobs:
 
       - name: Publish Release to Latest WP 🎉
         id: publish_latest
-        uses: bmlt-enabled/wordpress-releases-github-action@v1.3
+        uses: bmlt-enabled/wordpress-releases-github-action@v2
         with:
           file: ${{ env.DIST_DIR_S3 }}/${{ env.ZIP_FILENAME }}
           s3_key: ${{ env.S3_KEY }}

@@ -84,10 +84,12 @@ class Settings
         $this->options['location_text_checkbox']     = isset($_POST['location_text_checkbox']) ? sanitize_text_field($_POST['location_text_checkbox']) : '';
         $this->options['show_header_checkbox']       = isset($_POST['show_header_checkbox']) ? sanitize_text_field($_POST['show_header_checkbox']) : '';
         $this->options['limit_to_today_checkbox']    = isset($_POST['limit_to_today_checkbox']) ? sanitize_text_field($_POST['limit_to_today_checkbox']) : '';
+        $this->options['show_area_filter_checkbox']  = isset($_POST['show_area_filter_checkbox']) ? sanitize_text_field($_POST['show_area_filter_checkbox']) : '';
         $this->options['time_format_dropdown']       = isset($_POST['time_format_dropdown']) ? sanitize_text_field($_POST['time_format_dropdown']) : '';
         $this->options['weekday_language_dropdown']  = isset($_POST['weekday_language_dropdown']) ? sanitize_text_field($_POST['weekday_language_dropdown']) : '';
         $this->options['custom_query']               = isset($_POST['custom_query']) ? sanitize_text_field($_POST['custom_query']) : '';
-        $this->options['custom_css_um']              = isset($_POST['custom_query']) ? $_POST['custom_css_um'] : '';
+        $this->options['meetings']                   = isset($_POST['meetings']) ? sanitize_text_field($_POST['meetings']) : '';
+        $this->options['custom_css_um']              = isset($_POST['custom_css_um']) ? $_POST['custom_css_um'] : '';
         $this->saveAdminOptions();
     }
 
@@ -320,6 +322,10 @@ class Settings
                             <input type="checkbox" id="limit_to_today_checkbox" name="limit_to_today_checkbox" value="1" <?php echo ($this->options['limit_to_today_checkbox'] == "1" ? "checked" : "") ?>/>
                             <label for="limit_to_today_checkbox">Limit Results to Today Only</label>
                         </li>
+                        <li>
+                            <input type="checkbox" id="show_area_filter_checkbox" name="show_area_filter_checkbox" value="1" <?php echo (($this->options['show_area_filter_checkbox'] ?? '0') == "1" ? "checked" : "") ?>/>
+                            <label for="show_area_filter_checkbox">Show Area Filter Dropdown (for regions/recursive)</label>
+                        </li>
                     </ul>
                 </div>
                 <div style="padding: 0 15px;" class="postbox">
@@ -328,6 +334,15 @@ class Settings
                     <ul>
                         <li>
                             <input type="text" id="custom_query" name="custom_query" value="<?php echo $this->options['custom_query']; ?>">
+                        </li>
+                    </ul>
+                </div>
+                <div style="padding: 0 15px;" class="postbox">
+                    <h3>Specific Meetings</h3>
+                    <p>Comma separated meeting ids to include in addition to the service body results. Ex. 1234,5678</p>
+                    <ul>
+                        <li>
+                            <input type="text" id="meetings" name="meetings" value="<?php echo esc_attr($this->options['meetings'] ?? ''); ?>">
                         </li>
                     </ul>
                 </div>
@@ -409,9 +424,11 @@ class Settings
                 'location_text_checkbox'    => '0',
                 'show_header_checkbox'      => '0',
                 'limit_to_today_checkbox'   => '0',
+                'show_area_filter_checkbox' => '0',
                 'time_format_dropdown'      => '12',
                 'weekday_language_dropdown' => 'en',
                 'custom_query'              => '',
+                'meetings'                  => '',
                 'custom_css_um'             => ''
             ];
             update_option($this->optionsName, $theOptions);
